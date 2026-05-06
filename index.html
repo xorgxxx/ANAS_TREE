@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>شجرة التحقيق السيبراني v3.5</title>
+<title>شجرة التحقيق السيبراني v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -16,7 +16,7 @@
   --cyan:      #00eeff;
   --yellow:    #ffdd00;
   --bg:        #040407;
-  --panel:     rgba(7,9,15,0.98);
+  --panel:     rgba(7,9,15,0.97);
   --border:    rgba(255,34,51,0.30);
   --text:      #c8d0e0;
   --text-dim:  #50606e;
@@ -25,6 +25,7 @@
   --settings-w: 300px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
 html,body{
   font-family: var(--arab);
   background: var(--bg);
@@ -37,6 +38,7 @@ html,body{
   cursor: default;
   touch-action: manipulation;
 }
+
 /* ═══ BACKGROUND ═══ */
 #bg-canvas { position:fixed;inset:0;z-index:0;pointer-events:none; }
 .scanline {
@@ -47,6 +49,7 @@ html,body{
   position:fixed;inset:0;z-index:1;pointer-events:none;
   background: radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,0.8) 100%);
 }
+
 /* ═══ HEADER ═══ */
 header {
   position:relative;z-index:20;
@@ -93,6 +96,8 @@ header {
   animation:blink 2s step-end infinite;
 }
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.15}}
+
+/* Settings toggle button */
 .settings-toggle {
   width:36px;height:36px;flex-shrink:0;
   background:rgba(255,34,51,0.08);
@@ -118,47 +123,24 @@ header {
   display:none;
 }
 .settings-badge.show { display:block; }
-/* === BASICS === */
+
+/* ═══ MAIN ═══ */
 .main { display:flex;flex:1;overflow:hidden;position:relative;z-index:10; }
-/* === CANVAS === */
-.canvas-wrap { flex:1;position:relative;overflow:hidden;touch-action:none;cursor:crosshair; }
-/* == Arrow for hint == */
-.arrow-hint {
-  position:absolute;
-  z-index:9;
-  pointer-events:none;
-  top:60px; /* Give a gap under header */
-  right:65px;
-  width:150px;
-  height:40px;
-  display:flex;
-  align-items:flex-end;
-}
-.arrow-hint svg {
-  width:100px; height:40px; display:block;
-}
-.arrow-hint-label {
-  font-family:var(--arab);
-  font-size:1rem;
-  margin-right:10px;
-  margin-top:12px;
-  color:var(--red);
-  font-weight:700;
-  white-space:nowrap;
-  text-shadow:0 0 10px var(--red-glow);
-}
+
+/* ═══ CANVAS AREA ═══ */
+.canvas-wrap { flex:1;position:relative;overflow:hidden;cursor:crosshair;touch-action:none; }
 #treeCanvas { width:100%;height:100%;display:block; }
-/* ===== EMPTY STATE: improved with arrow ===== */
+
 .empty-state {
   position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;pointer-events:none;
-  gap:18px;opacity:0.39;transition:opacity 0.5s;
+  gap:14px;opacity:0.35;transition:opacity 0.5s;
 }
-.empty-state .arrow-hint { opacity:0.89;}
-.empty-state-text{font-family:var(--arab);font-size:1.09rem;color:var(--text-dim);letter-spacing:1.2px;text-align:center;line-height:2;}
-.empty-state .icon {font-family:var(--mono);font-size:2.5rem;color:var(--red);text-shadow:0 0 20px var(--red);}
 .empty-state.hidden{opacity:0;pointer-events:none;}
-/* ===== SIDE PANEL SETTINGS ===== */
+.empty-icon{font-family:var(--mono);font-size:2.5rem;color:var(--red);text-shadow:0 0 20px var(--red);}
+.empty-text{font-family:var(--mono);font-size:0.72rem;color:var(--text-dim);letter-spacing:2px;text-align:center;line-height:2;}
+
+/* ═══ SETTINGS PANEL (replaces sidebar) ═══ */
 .settings-panel {
   position:fixed;
   top:52px;right:0;
@@ -175,163 +157,342 @@ header {
   box-shadow:-10px 0 40px rgba(0,0,0,0.6);
 }
 .settings-panel.open { transform:translateX(0); }
-
 .settings-panel::-webkit-scrollbar{width:3px;}
 .settings-panel::-webkit-scrollbar-thumb{background:rgba(255,34,51,0.3);border-radius:2px;}
+
+/* Panel overlay (click outside to close) */
 .panel-backdrop {
   display:none;position:fixed;inset:0;z-index:49;
   background:rgba(0,0,0,0.3);backdrop-filter:blur(1px);
 }
 .panel-backdrop.show { display:block; }
+
 .panel-header {
-  padding:12px 10px 10px;
+  padding:14px 16px 10px;
   border-bottom:1px solid rgba(255,34,51,0.15);
   display:flex;align-items:center;justify-content:space-between;
   flex-shrink:0;
   background:rgba(4,4,7,0.6);
   position:sticky;top:0;z-index:2;
 }
-.panel-title {
-  font-family:var(--mono);
-  font-size:0.73rem;
-  color:var(--red);letter-spacing:3px;text-shadow:0 0 8px var(--red);
-}
+.panel-title { font-family:var(--mono);font-size:0.72rem;color:var(--red);letter-spacing:3px;text-shadow:0 0 8px var(--red); }
 .panel-close {
-  width:25px;height:25px;border:1px solid rgba(255,34,51,0.2);border-radius:4px;
+  width:28px;height:28px;border:1px solid rgba(255,34,51,0.25);border-radius:4px;
   background:transparent;color:var(--text-dim);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:0.83rem;
+  display:flex;align-items:center;justify-content:center;font-size:0.9rem;
   transition:all 0.15s;
 }
 .panel-close:hover { border-color:var(--red);color:var(--red); }
-/* بسيطة وبحجم صغير جدا للأزرار  */
+
 .sidebar-section {
-  padding:7px 8px 5px 8px;
-  border-bottom:1px solid rgba(255,34,51,0.06);
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,34,51,0.08);
 }
-.settings-panel .btn {
-  font-size:0.78rem !important;
-  min-height:32px;
-  padding:7px 7px;
-  margin-bottom:5px;
-  border-radius:3px;
-}
-.settings-panel .btn:last-child {margin-bottom:0;}
-/* label في اللوحة الجانبية */
 .sidebar-label {
-  font-family:var(--mono);font-size:0.52rem;color:var(--red-dim);
-  letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;
-  text-shadow:0 0 6px var(--red-dim);display:flex;align-items:center;gap:3px;
+  font-family:var(--mono);font-size:0.58rem;color:var(--red-dim);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:9px;
+  text-shadow:0 0 6px var(--red-dim);display:flex;align-items:center;gap:6px;
 }
-.sidebar-label::after { content:'';flex:1;height:1px;background:rgba(255,34,51,0.14); }
-/* زر صغير جداً لغيير اللون */
-.color-picker {
-  width:30px;height:20px;vertical-align:middle;border-radius:2px;
-  border:1px solid #333;box-shadow:0 0 6px rgba(0,0,0,0.2);margin-left:4px;
-}
-.type-color-row {
-  display:flex;align-items:center;gap:7px; margin-bottom:3px; font-size:0.8em;
-}
-.type-color-row label {flex:1;}
-/* SIMPLE BUTTONS */
+.sidebar-label::after { content:'';flex:1;height:1px;background:rgba(255,34,51,0.15); }
+
 .btn {
-  font-family:var(--arab);font-size:0.8rem;font-weight:600;
-  width:100%;padding:9px 14px;border:1px solid;border-radius:4px;
+  font-family:var(--arab);font-size:0.84rem;font-weight:600;
+  width:100%;padding:10px 14px;border:1px solid;border-radius:5px;
   cursor:pointer;transition:all 0.18s;display:flex;align-items:center;
   gap:8px;margin-bottom:7px;background:transparent;
   position:relative;overflow:hidden;text-align:right;
-  min-height:36px;
+  min-height:44px;
 }
 .btn::before { content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.18s; }
 .btn:hover::before{opacity:1;}
 .btn:hover{transform:translateX(2px);}
 .btn:active{transform:translateX(0) scale(0.97);}
-.btn-add{color:var(--red);border-color:rgba(255,34,51,0.23);}
-.btn-edit{color:var(--cyan);border-color:rgba(0,238,255,0.22);}
-.btn-del {color:#ff7755;border-color:rgba(255,119,85,0.18);}
-.btn-secondary{color:var(--text-dim);border-color:rgba(180,200,220,0.11);font-size:0.77rem;}
-.btn-link{color:var(--green);border-color:rgba(0,255,136,0.1);}
-.btn-link::before{background:rgba(0,255,136,0.04);}
-.btn-link:hover{border-color:var(--green)}
-/* ═══ CONTINUE: OTHER STYLES WITHOUT REMOVING PREVIOUS FEATURES ═══ */
+
+.btn-add{color:var(--red);border-color:rgba(255,34,51,0.35);text-shadow:0 0 8px var(--red);}
+.btn-add::before{background:rgba(255,34,51,0.07);}
+.btn-add:hover{border-color:var(--red);box-shadow:0 0 14px rgba(255,34,51,0.25);}
+
+.btn-edit{color:var(--cyan);border-color:rgba(0,238,255,0.25);text-shadow:0 0 8px var(--cyan);}
+.btn-edit::before{background:rgba(0,238,255,0.05);}
+.btn-edit:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,238,255,0.2);}
+
+.btn-del{color:#ff7755;border-color:rgba(255,119,85,0.25);}
+.btn-del::before{background:rgba(255,119,85,0.05);}
+.btn-del:hover{border-color:#ff7755;box-shadow:0 0 14px rgba(255,119,85,0.2);}
+
+.btn-secondary{color:var(--text-dim);border-color:rgba(180,200,220,0.12);font-size:0.8rem;}
+.btn-secondary:hover{color:var(--text);border-color:rgba(180,200,220,0.3);}
+
+.btn-link{color:var(--green);border-color:rgba(0,255,136,0.25);text-shadow:0 0 8px var(--green);}
+.btn-link::before{background:rgba(0,255,136,0.05);}
+.btn-link:hover{border-color:var(--green);box-shadow:0 0 14px rgba(0,255,136,0.2);}
+
+/* Info box */
 .info-box {
-  background:rgba(255,34,51,0.04);border:1px solid rgba(255,34,51,0.14);
-  border-radius:3px;padding:7px 6px; font-family:var(--mono);
-  font-size:0.67rem;color:var(--text-dim);line-height:1.8;min-height:55px;
+  background:rgba(255,34,51,0.04);border:1px solid rgba(255,34,51,0.18);
+  border-radius:4px;padding:10px 12px;font-family:var(--mono);
+  font-size:0.7rem;color:var(--text-dim);line-height:1.9;min-height:75px;
 }
-.info-box .hl{color:var(--red);text-shadow:0 0 4px var(--red);}
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 3px;}
+.info-box .hl{color:var(--red);text-shadow:0 0 6px var(--red);}
+.info-box .hl2{color:var(--cyan);}
+.info-box .hl3{color:var(--green);}
+
+/* Type grid */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
 .type-btn {
-  font-family:var(--mono);font-size:0.62rem;padding:7px 3px;
-  border:1px solid rgba(255,34,51,0.19);border-radius:2px;
+  font-family:var(--mono);font-size:0.62rem;padding:8px 5px;
+  border:1px solid rgba(255,34,51,0.2);border-radius:3px;
   background:transparent;color:var(--text-dim);cursor:pointer;
-  text-align:center;transition:all 0.12s;letter-spacing:1px;
-  min-height:30px;
+  text-align:center;transition:all 0.15s;letter-spacing:1px;
+  min-height:36px;
 }
 .type-btn:hover,.type-btn.active {
   border-color:var(--red);color:var(--red);
-  background:rgba(255,34,51,0.06);text-shadow:0 0 3px var(--red);
+  background:rgba(255,34,51,0.08);text-shadow:0 0 6px var(--red);
 }
-.minimap {position:absolute;bottom:84px;left:6px;width:138px;height:80px;background:rgba(4,4,7,0.91);border:1px solid rgba(255,34,51,0.14);border-radius:2px;overflow:hidden;z-index:15;}
-/* ===== ZOOM CONTROLS ===== */
+
+/* Link list in sidebar */
+.link-list { display:flex;flex-direction:column;gap:5px;max-height:160px;overflow-y:auto; }
+.link-item {
+  display:flex;align-items:center;gap:6px;padding:8px 10px;
+  background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);
+  border-radius:4px;cursor:pointer;transition:all 0.15s;
+  min-height:40px;
+}
+.link-item:hover{background:rgba(0,255,136,0.1);border-color:rgba(0,255,136,0.4);}
+.link-item-alias{font-family:var(--mono);font-size:0.72rem;color:var(--green);flex:1;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+.link-empty{font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);text-align:center;padding:10px;opacity:0.5;}
+
+/* Shortcut rows */
+.shortcut-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:0.73rem;color:var(--text-dim);}
+.shortcut-row kbd{font-family:var(--mono);font-size:0.6rem;background:rgba(255,34,51,0.08);border:1px solid rgba(255,34,51,0.25);color:var(--red);padding:2px 6px;border-radius:3px;}
+
+/* ═══ MODAL ═══ */
+.overlay {
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.82);z-index:200;
+  align-items:center;justify-content:center;backdrop-filter:blur(5px);
+  padding:16px;
+}
+.overlay.active{display:flex;}
+.modal {
+  background:rgba(6,8,14,0.99);border:1px solid var(--red);border-radius:8px;
+  padding:22px 20px;width:420px;max-width:100%;max-height:calc(100vh - 32px);
+  overflow-y:auto;
+  box-shadow:0 0 60px rgba(255,34,51,0.35),0 0 100px rgba(255,34,51,0.1);
+  animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative;
+  scrollbar-width:thin;scrollbar-color:rgba(255,34,51,0.3) transparent;
+}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+@keyframes modalIn{from{transform:scale(0.85) translateY(-20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-title{font-family:var(--mono);font-size:0.82rem;color:var(--red);letter-spacing:3px;text-shadow:0 0 10px var(--red);margin-bottom:16px;}
+.modal-field{margin-bottom:13px;}
+.modal-field label{display:block;font-family:var(--mono);font-size:0.6rem;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;}
+.modal-field input,.modal-field select,.modal-field textarea {
+  width:100%;font-family:var(--arab);font-size:0.95rem;padding:10px 13px;
+  background:rgba(255,34,51,0.04);border:1px solid rgba(255,34,51,0.3);
+  border-radius:4px;color:var(--text);outline:none;
+  transition:border 0.2s,box-shadow 0.2s;text-align:right;direction:rtl;
+  -webkit-appearance:none;
+}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--red);box-shadow:0 0 14px rgba(255,34,51,0.2);}
+.modal-field select option{background:#08090f;}
+.modal-field textarea{resize:vertical;min-height:55px;}
+
+/* Link list in modal */
+.modal-links{max-height:130px;overflow-y:auto;margin-top:6px;display:flex;flex-direction:column;gap:5px;}
+.modal-link-item{
+  display:flex;align-items:center;gap:6px;padding:7px 9px;
+  background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);border-radius:3px;
+}
+.modal-link-alias{font-family:var(--mono);font-size:0.7rem;color:var(--green);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.modal-link-url{font-family:var(--mono);font-size:0.6rem;color:var(--text-dim);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;direction:ltr;}
+.modal-link-del{color:rgba(255,119,85,0.5);cursor:pointer;padding:2px 4px;transition:color 0.15s;font-size:1rem;flex-shrink:0;}
+.modal-link-del:hover{color:#ff7755;}
+.modal-link-add{font-family:var(--arab);font-size:0.8rem;color:var(--green);background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.2);border-radius:4px;padding:8px 10px;cursor:pointer;transition:all 0.15s;width:100%;text-align:center;margin-top:4px;min-height:40px;}
+.modal-link-add:hover{background:rgba(0,255,136,0.12);border-color:rgba(0,255,136,0.5);}
+
+.modal-btns{display:flex;gap:8px;justify-content:flex-start;margin-top:18px;}
+.mbtn{font-family:var(--arab);font-size:0.9rem;font-weight:600;padding:10px 22px;border-radius:4px;border:1px solid;cursor:pointer;transition:all 0.15s;background:transparent;min-height:44px;}
+.mbtn-confirm{color:var(--red);border-color:var(--red);text-shadow:0 0 6px var(--red);}
+.mbtn-confirm:hover{background:rgba(255,34,51,0.12);box-shadow:0 0 20px rgba(255,34,51,0.3);}
+.mbtn-cancel{color:var(--text-dim);border-color:rgba(180,200,220,0.18);}
+.mbtn-cancel:hover{color:var(--text);border-color:rgba(180,200,220,0.4);}
+
+/* ═══ LINK OPEN POPUP ═══ */
+.link-popup {
+  position:fixed;z-index:350;
+  background:rgba(4,6,12,0.98);
+  border:1px solid rgba(0,255,136,0.5);
+  border-radius:8px;
+  min-width:220px;max-width:320px;
+  box-shadow:0 0 30px rgba(0,255,136,0.2);
+  overflow:hidden;
+  animation:ctxIn 0.15s ease-out;
+  display:none;
+}
+.link-popup.active { display:block; }
+.link-popup-header {
+  padding:8px 12px;
+  border-bottom:1px solid rgba(0,255,136,0.12);
+  font-family:var(--mono);font-size:0.6rem;color:rgba(0,255,136,0.5);
+  letter-spacing:2px;
+}
+.link-popup-item {
+  display:flex;align-items:center;gap:8px;
+  padding:10px 13px;border-bottom:1px solid rgba(0,255,136,0.06);
+  cursor:pointer;transition:all 0.12s;
+}
+.link-popup-item:last-child{border-bottom:none;}
+.link-popup-item:hover{background:rgba(0,255,136,0.08);}
+.link-popup-alias{font-family:var(--mono);font-size:0.78rem;color:var(--green);flex:1;}
+.link-popup-url{font-family:var(--mono);font-size:0.58rem;color:var(--text-dim);direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+.link-popup-arrow{color:rgba(0,255,136,0.4);font-size:0.9rem;flex-shrink:0;}
+
+/* ═══ CONTEXT MENU ═══ */
+.ctx-menu {
+  display:none;position:fixed;z-index:300;
+  background:rgba(6,8,14,0.98);border:1px solid rgba(255,34,51,0.4);
+  border-radius:6px;min-width:180px;box-shadow:0 0 30px rgba(255,34,51,0.22);overflow:hidden;
+}
+.ctx-menu.active{display:block;animation:ctxIn 0.12s ease-out;}
+@keyframes ctxIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.ctx-item{font-family:var(--arab);font-size:0.85rem;padding:10px 14px;cursor:pointer;color:var(--text-dim);display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,34,51,0.06);transition:all 0.12s;direction:rtl;min-height:44px;}
+.ctx-item:last-child{border-bottom:none;}
+.ctx-item:hover{background:rgba(255,34,51,0.1);color:var(--red);}
+.ctx-item.danger:hover{background:rgba(255,119,85,0.1);color:#ff7755;}
+.ctx-item.c-green:hover{background:rgba(0,255,136,0.08);color:var(--green);}
+.ctx-item.c-cyan:hover{background:rgba(0,238,255,0.08);color:var(--cyan);}
+.ci{font-size:1rem;min-width:20px;text-align:center;}
+.ctx-divider{height:1px;background:rgba(255,34,51,0.12);margin:2px 0;}
+
+/* ═══ TOOLTIP ═══ */
+.tooltip {
+  position:fixed;z-index:150;background:rgba(6,8,14,0.97);
+  border:1px solid rgba(255,34,51,0.35);border-radius:5px;padding:9px 13px;
+  font-family:var(--mono);font-size:0.68rem;color:var(--text);pointer-events:none;
+  opacity:0;transition:opacity 0.15s;max-width:260px;line-height:1.8;
+}
+.tooltip.show{opacity:1;}
+.tt-name{color:var(--red);font-size:0.75rem;display:block;margin-bottom:3px;}
+.tt-type{color:var(--cyan);font-size:0.62rem;letter-spacing:1px;}
+.tt-note{color:var(--text-dim);font-size:0.65rem;margin-top:4px;}
+.tt-links-count{color:var(--green);font-size:0.62rem;display:block;margin-top:3px;}
+
+/* ═══ MINIMAP ═══ */
+.minimap {
+  position:absolute;bottom:100px;left:12px;
+  width:140px;height:90px;
+  background:rgba(4,4,7,0.88);border:1px solid rgba(255,34,51,0.2);
+  border-radius:4px;overflow:hidden;z-index:15;
+  transition:opacity 0.3s;
+}
+.minimap-canvas{width:100%;height:100%;}
+.minimap-label{position:absolute;top:3px;left:5px;font-family:var(--mono);font-size:0.5rem;color:rgba(255,34,51,0.4);letter-spacing:2px;}
+
+/* ═══ ZOOM CONTROLS ═══ */
 .zoom-controls {
-  position:absolute;bottom:10px;left:10px;
-  display:flex;flex-direction:column;gap:2px;z-index:15;
+  position:absolute;bottom:12px;left:12px;
+  display:flex;flex-direction:column;gap:4px;z-index:15;
 }
 .zoom-btn {
-  width:34px;height:34px;background:rgba(4,4,7,0.88);
-  border:1px solid rgba(255,34,51,0.14);border-radius:5px;
-  color:var(--red);font-size:1.07rem;cursor:pointer;
+  width:38px;height:38px;background:rgba(4,4,7,0.92);
+  border:1px solid rgba(255,34,51,0.25);border-radius:5px;
+  color:var(--red);font-size:1.1rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:all 0.12s;font-family:var(--mono);
+  transition:all 0.15s;font-family:var(--mono);
   -webkit-tap-highlight-color:transparent;
 }
-.zoom-btn:hover{border-color:var(--red);box-shadow:0 0 8px rgba(255,34,51,0.3);}
-.zoom-btn:active{background:rgba(255,34,51,0.11);}
-.zoom-pct{font-family:var(--mono);font-size:0.54rem;color:var(--text-dim);text-align:center;}
-/* شايفين زر الفاب للجوال؟! ثابت */
+.zoom-btn:hover{border-color:var(--red);box-shadow:0 0 10px rgba(255,34,51,0.3);}
+.zoom-btn:active{background:rgba(255,34,51,0.15);transform:scale(0.95);}
+.zoom-pct{font-family:var(--mono);font-size:0.58rem;color:var(--text-dim);text-align:center;}
+
+/* ═══ DRAG HINT ═══ */
+.drag-hint {
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:0.58rem;color:rgba(255,34,51,0.35);
+  letter-spacing:2px;pointer-events:none;z-index:5;white-space:nowrap;
+  animation:hintFade 5s forwards 3s;
+}
+@keyframes hintFade{0%{opacity:1}100%{opacity:0}}
+
+/* ═══ NOTIFICATION ═══ */
+.notif {
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(6,8,14,0.97);border:1px solid var(--green);
+  border-radius:5px;padding:9px 20px;font-family:var(--mono);
+  font-size:0.72rem;color:var(--green);text-shadow:0 0 8px var(--green);
+  z-index:400;pointer-events:none;opacity:0;
+  transition:opacity 0.3s;letter-spacing:1px;white-space:nowrap;
+  max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+}
+.notif.show{opacity:1;}
+
+/* ═══ FAB: Mobile Add Button ═══ */
 .fab-add {
-  position:fixed;bottom:19px;right:19px;z-index:40;
-  width:46px;height:46px;border-radius:50%;
+  position:fixed;bottom:20px;right:20px;z-index:40;
+  width:52px;height:52px;border-radius:50%;
   background:rgba(255,34,51,0.12);
-  border:1.2px solid var(--red);
-  color:var(--red);font-size:1.25rem;
+  border:1.5px solid var(--red);
+  color:var(--red);font-size:1.6rem;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;
-  box-shadow:0 0 12px rgba(255,34,51,0.23),0 4px 20px rgba(0,0,0,0.23);
-  transition:all 0.18s;
+  box-shadow:0 0 20px rgba(255,34,51,0.3),0 4px 20px rgba(0,0,0,0.5);
+  transition:all 0.2s;
   -webkit-tap-highlight-color:transparent;
 }
-.fab-add:hover,.fab-add:active {background:rgba(255,34,51,0.21);}
+.fab-add:hover,.fab-add:active {
+  background:rgba(255,34,51,0.25);
+  box-shadow:0 0 30px rgba(255,34,51,0.5);
+  transform:scale(1.08);
+}
+/* Hide on desktop */
 @media (min-width:640px) { .fab-add { display:none; } }
 
-.drag-hint {position:absolute;top:8px;left:50%;transform:translateX(-50%);
-  font-family:var(--mono);font-size:0.51rem;color:rgba(255,34,51,0.23);
-  letter-spacing:1px;pointer-events:none;z-index:5;white-space:nowrap;}
+/* ═══ LINK ROW INPUT ═══ */
+.link-row-inputs{display:flex;gap:6px;margin-bottom:6px;}
+.link-row-inputs input:first-child{width:110px;flex-shrink:0;}
+.link-row-inputs input:last-child{flex:1;direction:ltr;text-align:left;}
+
+/* ═══ MOBILE RESPONSIVE ═══ */
 @media (max-width:639px) {
-  :root { --settings-w: min(90vw, 320px); }
-  header { padding:5px 6px; }
-  .header-title { font-size:0.66rem; }
+  :root { --settings-w: min(88vw, 320px); }
+
+  header { padding:8px 12px; }
+  .header-title { font-size:0.75rem;letter-spacing:1px; }
+  .header-sub { display:none; }
+  .stat-chips-wrap .stat-chip:nth-child(n+3) { display:none; }
+
   .minimap { display:none; }
-  .drag-hint { font-size:0.4rem; }
+  .drag-hint { font-size:0.5rem; }
+
   .settings-panel { top:52px; }
+  .modal { padding:18px 16px; }
+  .modal-btns { gap:10px; }
+  .mbtn { padding:11px 16px;font-size:0.88rem; }
 }
-.panel-section-header {display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:2px 0 2px;}
-.panel-section-header .collapse-arrow {font-size:0.57rem;color:var(--text-dim);transition:transform 0.18s;}
-.panel-section-header.collapsed .collapse-arrow {transform:rotate(-90deg);}
-.panel-section-body {overflow:hidden;transition:max-height 0.18s ease;}
-.panel-section-body.hidden {max-height:0!important;}
-.lm-form-area {background:rgba(255,34,51,0.02);border:1px solid rgba(255,34,51,0.07);border-radius:3px;padding:6px;margin-top:4px;}
-.lm-form-label{font-family:var(--mono);font-size:0.49rem;color:rgba(255,34,51,0.39);letter-spacing:2px;margin-bottom:6px;}
-.link-list{display:flex;flex-direction:column;gap:5px;}
-.link-empty{font-family:var(--mono);font-size:0.60rem;color:var(--text-dim);text-align:center;padding:7px;opacity:0.5;}
-.link-item{font-family:var(--mono);font-size:0.69rem;color:var(--green);border:1px solid rgba(0,255,136,0.13);border-radius:2px;padding:7px 10px;background:rgba(0,255,136,0.03);}
-input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20px;}
-@media (max-width:480px) {
-  .settings-panel, .modal {font-size:0.97em;}
-  .sidebar-section {padding:5px 3px 3px 3px;}
-  .panel-title {font-size:0.66rem;}
+
+/* ═══ PANEL SECTION COLLAPSIBLE ═══ */
+.panel-section-header {
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;
+  padding:2px 0 2px;
 }
-/* لا نزيل لا مميزات ولا أكواد! */
+.panel-section-header .collapse-arrow {
+  font-size:0.65rem;color:var(--text-dim);transition:transform 0.2s;
+}
+.panel-section-header.collapsed .collapse-arrow { transform:rotate(-90deg); }
+.panel-section-body { overflow:hidden;transition:max-height 0.3s ease; }
+.panel-section-body.hidden { max-height:0!important; }
+
+/* ═══ INPUT LINK AREA ═══ */
+.lm-form-area {
+  background:rgba(255,34,51,0.03);
+  border:1px solid rgba(255,34,51,0.1);
+  border-radius:5px;padding:10px;margin-top:8px;
+}
+.lm-form-label{font-family:var(--mono);font-size:0.58rem;color:rgba(255,34,51,0.5);letter-spacing:2px;margin-bottom:7px;}
+
 </style>
 </head>
 <body>
@@ -346,7 +507,7 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
     <div class="logo-hex">SYS</div>
     <div class="header-titles">
       <div class="header-title">CYBER INTEL // شجرة التحقيق</div>
-      <div class="header-sub">نظام التحقيق السيبراني • v3.5</div>
+      <div class="header-sub">نظام التحقيق السيبراني • v3.0</div>
     </div>
   </div>
   <div class="header-right">
@@ -365,6 +526,8 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
 
 <!-- MAIN -->
 <div class="main">
+
+  <!-- CANVAS -->
   <div class="canvas-wrap" id="canvasWrap">
     <svg id="treeCanvas" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -395,51 +558,48 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
       <g id="linksG"></g>
       <g id="nodesG"></g>
     </svg>
-    <!-- EMPTY STATE WITH ARROW -->
+
     <div class="empty-state" id="emptyState">
-      <div class="icon">⬡</div>
-      <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-        <div class="empty-state-text" style="margin-bottom:10px;">
-          اضغط على زر
-        </div>
-        <!-- arrow and pointed label -->
-        <div class="arrow-hint">
-          <svg viewBox="0 0 100 40"><path d="M0,30 Q80,7 94,1" stroke="#ff2233" stroke-width="2.1" fill="none" marker-end="url(#arrowRed)" /></svg>
-          <span class="arrow-hint-label">الإعدادات</span>
-        </div>
-        <div class="empty-state-text" style="margin-top:7px;">
-          لتبدأ رحلتك السيبرانية!
-        </div>
+      <div class="empty-icon">⬡</div>
+      <div class="empty-text">
+        // لا توجد بيانات //<br>
+        اضغط <strong style="color:var(--red)">⚙</strong> لفتح الإعدادات وإضافة عقدة<br>
+        <span style="font-size:0.58rem;opacity:0.5;">أو اضغط [ N ] لإضافة عقدة جذر</span>
       </div>
-      <div class="empty-state-text" style="font-size:.66rem;opacity:.62;">الآن ⬆ اصنع التغيير الأول</div>
     </div>
-    <!-- MINIMAP SMALL -->
+
+    <!-- MINIMAP -->
     <div class="minimap" id="minimap">
       <div class="minimap-label">MAP</div>
       <canvas class="minimap-canvas" id="minimapCanvas"></canvas>
     </div>
+
     <!-- ZOOM CONTROLS -->
     <div class="zoom-controls">
-      <button class="zoom-btn" onclick="scaleNodes(1.12)" title="تكبير العقد (Shift ⇧)">+</button>
+      <button class="zoom-btn" onclick="zoomIn()" title="تكبير">+</button>
       <div class="zoom-pct" id="zoomPct">100%</div>
-      <button class="zoom-btn" onclick="scaleNodes(1/1.12)" title="تصغير العقد (Shift ⇧)">−</button>
+      <button class="zoom-btn" onclick="zoomOut()" title="تصغير">−</button>
       <button class="zoom-btn" onclick="centerView()" title="توسيط" style="font-size:0.7rem;">⊙</button>
     </div>
-    <div class="drag-hint" id="dragHint">[ اسحب بإصبعين/الماوس ] للتحريك • [ قرصة/عجلة ] للتكبير • [ اضغط مطولاً ] للقائمة</div>
+
+    <div class="drag-hint" id="dragHint">[ اسحب بإصبعين ] للتحريك • [ قرصة ] للتكبير • [ اضغط مطولاً ] للقائمة</div>
   </div>
-</div>
+
+</div><!-- /main -->
 
 <!-- FAB Mobile Button -->
 <button class="fab-add" onclick="openAdd()" title="إضافة عقدة">⊕</button>
 
 <!-- SETTINGS PANEL BACKDROP -->
 <div class="panel-backdrop" id="panelBackdrop" onclick="closeSettingsPanel()"></div>
-<!-- SETTINGS PANEL: EXTENDED, WITH COLOR PICKERS AND NODE SIZE -->
+
+<!-- SETTINGS PANEL -->
 <div class="settings-panel" id="settingsPanel">
   <div class="panel-header">
     <div class="panel-title">// الإعدادات</div>
     <button class="panel-close" onclick="closeSettingsPanel()">✕</button>
   </div>
+
   <!-- ACTIONS -->
   <div class="sidebar-section">
     <div class="sidebar-label">// الإجراءات</div>
@@ -447,21 +607,22 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
     <button class="btn btn-edit" onclick="openEdit();closeSettingsPanel()">✎ تعديل العقدة</button>
     <button class="btn btn-del" onclick="deleteSelected();closeSettingsPanel()">⊗ حذف العقدة</button>
   </div>
-  <!-- NODE TYPE COLORS -->
-  <div class="sidebar-section" id="typeColorsSection">
-    <div class="sidebar-label">// ألوان الأنواع</div>
-    <div id="typeColorEdit"></div>
-  </div>
-  <!-- NODE SIZE OVERRIDE -->
-  <div class="sidebar-section" id="nodeSizeSection">
-    <div class="sidebar-label">// حجم العقدة</div>
-    <div>
-      <label for="singleNodeScale" style="font-size:0.67em;">حجم العقدة الحالية:</label>
-      <input type="range" min="0.45" max="2.4" step="0.01" value="1" id="singleNodeScale" oninput="onSingleNodeScaleEdit()" style="vertical-align:middle;width:100px;">
-      <span id="singleNodeScaleValue">1</span>x
+
+  <!-- NODE TYPE -->
+  <div class="sidebar-section">
+    <div class="sidebar-label">// نوع العقدة</div>
+    <div class="type-grid" id="typeGrid">
+      <button class="type-btn active" data-type="هدف">هدف</button>
+      <button class="type-btn" data-type="مشتبه">مشتبه</button>
+      <button class="type-btn" data-type="IP">IP/HOST</button>
+      <button class="type-btn" data-type="دومين">دومين</button>
+      <button class="type-btn" data-type="ملف">ملف</button>
+      <button class="type-btn" data-type="رابط">رابط</button>
+      <button class="type-btn" data-type="شخص">شخص</button>
+      <button class="type-btn" data-type="منظمة">منظمة</button>
     </div>
-    <small style="color:var(--text-dim);font-size:0.66em;">(كل عقدة لها حجم خاص يمكن تعديله من هنا. الحجم الافتراضي 1)</small>
   </div>
+
   <!-- SELECTED NODE INFO -->
   <div class="sidebar-section">
     <div class="sidebar-label">// العقدة المحددة</div>
@@ -471,14 +632,16 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
       <span style="color:#304050;font-size:0.62rem">اضغط على عقدة لعرض بياناتها</span>
     </div>
   </div>
+
   <!-- GLOBAL LINKS -->
   <div class="sidebar-section">
     <div class="sidebar-label">// اختصارات الروابط</div>
     <div class="link-list" id="globalLinkList">
       <div class="link-empty">لا توجد اختصارات بعد</div>
     </div>
-    <button class="btn btn-link" onclick="openLinkManager();closeSettingsPanel();">⊞ إدارة الاختصارات</button>
+    <button class="btn btn-link" onclick="openLinkManager();closeSettingsPanel();" style="margin-top:8px;margin-bottom:0;">⊞ إدارة الاختصارات</button>
   </div>
+
   <!-- TREE VIEW -->
   <div class="sidebar-section">
     <div class="sidebar-label">// عرض الشجرة</div>
@@ -486,13 +649,27 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
     <button class="btn btn-secondary" onclick="collapseAll();closeSettingsPanel()">▶ طي الكل</button>
     <button class="btn btn-secondary" onclick="centerView();closeSettingsPanel()">⊙ توسيط العرض</button>
   </div>
+
+  <!-- KEYBOARD SHORTCUTS -->
+  <div class="sidebar-section">
+    <div class="sidebar-label">// اختصارات لوحة المفاتيح</div>
+    <div class="shortcut-row"><span>إضافة عقدة</span><kbd>N</kbd></div>
+    <div class="shortcut-row"><span>تعديل</span><kbd>E</kbd></div>
+    <div class="shortcut-row"><span>حذف</span><kbd>Del</kbd></div>
+    <div class="shortcut-row"><span>طي/توسيع</span><kbd>C</kbd></div>
+    <div class="shortcut-row"><span>توسيط</span><kbd>Space</kbd></div>
+    <div class="shortcut-row"><span>إلغاء</span><kbd>Esc</kbd></div>
+  </div>
+
   <!-- EXPORT / IMPORT / RESET -->
   <div class="sidebar-section">
-    <button class="btn" onclick="exportData()" style="color:var(--yellow);border-color:rgba(255,221,0,0.19);">⬇ تصدير البيانات</button>
-    <button class="btn" onclick="importData()" style="color:var(--cyan);border-color:rgba(0,238,255,0.14);">⬆ استيراد البيانات</button>
-    <button class="btn btn-del" onclick="resetTree()">⚠ إعادة ضبط الكل</button>
+    <button class="btn" onclick="exportData()" style="color:var(--yellow);border-color:rgba(255,221,0,0.25);margin-bottom:7px;">⬇ تصدير البيانات</button>
+    <button class="btn" onclick="importData()" style="color:var(--cyan);border-color:rgba(0,238,255,0.25);margin-bottom:7px;">⬆ استيراد البيانات</button>
+    <button class="btn btn-del" onclick="resetTree()" style="margin-bottom:0;">⚠ إعادة ضبط الكل</button>
   </div>
-</div>
+
+</div><!-- /settings-panel -->
+
 <!-- CONTEXT MENU -->
 <div class="ctx-menu" id="ctxMenu">
   <div class="ctx-item" onclick="ctxAdd()"><span class="ci">⊕</span> إضافة فرع</div>
@@ -503,22 +680,34 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
   <div class="ctx-divider"></div>
   <div class="ctx-item danger" onclick="ctxDelete()"><span class="ci">⊗</span> حذف العقدة</div>
 </div>
+
 <!-- LINK POPUP (when clicking alias on node) -->
 <div class="link-popup" id="linkPopup">
   <div class="link-popup-header">// فتح الرابط</div>
   <div id="linkPopupItems"></div>
 </div>
-<!-- NOTIF/TOOLTIPS/MODALS... إلخ مثل الأصل -->
-<div class="tooltip" id="tooltip" style="display:none;"></div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip">
+  <span class="tt-name" id="ttName"></span>
+  <span class="tt-type" id="ttType"></span>
+  <div class="tt-note" id="ttNote"></div>
+  <span class="tt-links-count" id="ttLinks"></span>
+</div>
+
+<!-- NOTIFICATION -->
 <div class="notif" id="notif"></div>
-<!-- MODALS (إضافة/تعديل) + LINKS IMPORT/EXPORT ... إلخ كما كانت إلخ الخ -->
+
+<!-- MODAL: ADD / EDIT NODE -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">// إضافة عقدة</div>
+
     <div class="modal-field">
       <label>// اسم العقدة</label>
       <input type="text" id="inpName" placeholder="اسم العقدة..." maxlength="40" autocomplete="off"/>
     </div>
+
     <div class="modal-field">
       <label>// النوع</label>
       <select id="inpType">
@@ -532,10 +721,12 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
         <option value="منظمة">منظمة</option>
       </select>
     </div>
+
     <div class="modal-field">
       <label>// ملاحظات (اختياري)</label>
       <textarea id="inpNote" placeholder="ملاحظات..."></textarea>
     </div>
+
     <div class="modal-field">
       <label>// اختصارات الروابط</label>
       <div class="lm-form-area">
@@ -548,12 +739,14 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
       </div>
       <div class="modal-links" id="modalLinksList"></div>
     </div>
+
     <div class="modal-btns">
       <button class="mbtn mbtn-confirm" onclick="confirmModal()">تأكيد ▶</button>
       <button class="mbtn mbtn-cancel" onclick="closeModal()">إلغاء</button>
     </div>
   </div>
 </div>
+
 <!-- MODAL: LINK MANAGER -->
 <div class="overlay" id="overlayLinks">
   <div class="modal" style="width:460px;">
@@ -575,11 +768,13 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
     </div>
   </div>
 </div>
+
 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="handleImport(event)"/>
+
 <script>
-/** —————————————————————————————————————————
-    MATRIX RAIN BACKGROUND
-    ——————��—————————————————————————————————— **/
+// ══════════════════════════════════════════════════
+// BACKGROUND (Matrix Rain)
+// ══════════════════════════════════════════════════
 (function(){
   const c = document.getElementById('bg-canvas');
   const ctx = c.getContext('2d');
@@ -606,136 +801,77 @@ input[type="color"].color-picker {cursor:pointer;padding:0;border:none;height:20
   }
   frame();
 })();
-/* ——————————————————————— */
-/* DATA MODEL + LOCALSTORAGE state for scales/colors */
+
+// ══════════════════════════════════════════════════
+// SETTINGS PANEL
+// ══════════════════════════════════════════════════
+let settingsPanelOpen = false;
+
+function toggleSettingsPanel(){
+  if(settingsPanelOpen) closeSettingsPanel();
+  else openSettingsPanel();
+}
+
+function openSettingsPanel(){
+  settingsPanelOpen = true;
+  document.getElementById('settingsPanel').classList.add('open');
+  document.getElementById('panelBackdrop').classList.add('show');
+  document.getElementById('settingsToggle').classList.add('active');
+}
+
+function closeSettingsPanel(){
+  settingsPanelOpen = false;
+  document.getElementById('settingsPanel').classList.remove('open');
+  document.getElementById('panelBackdrop').classList.remove('show');
+  document.getElementById('settingsToggle').classList.remove('active');
+}
+
+// ══════════════════════════════════════════════════
+// DATA MODEL
+// ══════════════════════════════════════════════════
 let uid=1;
 function mkId(){ return uid++; }
 function mkNode(name,type='هدف',note='',parentId=null){
-  return { id:mkId(), name, type, note, parentId, children:[], collapsed:false, links:[], nodeScale:1 }; // unique scale
+  return { id:mkId(), name, type, note, parentId, children:[], collapsed:false, links:[] };
 }
+
 let root=null;
 let selectedId=null;
 let modalMode='add';
 let currentType='هدف';
-let panX=0, panY=0;
-let zoom=1;
-/* scale for all nodes (global), persisted! */
-let GLOBAL_NODE_SCALE = parseFloat(localStorage.getItem('c3_nodeScale')||'1');
-function setGlobalNodeScale(x) {
-  GLOBAL_NODE_SCALE = parseFloat(x.toFixed(3));
-  localStorage.setItem('c3_nodeScale',GLOBAL_NODE_SCALE);
-  render();
-}
-function scaleNodes(f) {
-  setGlobalNodeScale(GLOBAL_NODE_SCALE*f);
-  showNotif('تم تعديل حجم جميع العقد: '+Math.round(GLOBAL_NODE_SCALE*100)+'%');
-}
+let panX=0, panY=0, zoom=1;
+let isPanning=false, panStart={x:0,y:0};
 let modalLinks=[];
-/* COLOR PALETTE: persisted in localStorage */
-let TYPE_COLOR = JSON.parse(localStorage.getItem('c3_typeColors') || `{
-  "هدف":"#ff2233","مشتبه":"#ff6600","IP":"#00eeff",
-  "دومين":"#cc44ff","ملف":"#ffdd00","رابط":"#00ff88",
-  "شخص":"#ff88aa","منظمة":"#4488ff"
-}`);
-function saveTypeColors() {
-  localStorage.setItem('c3_typeColors',JSON.stringify(TYPE_COLOR));
-  render();
-}
-function resetTypeColors() {
-  TYPE_COLOR={
-  "هدف":"#ff2233","مشتبه":"#ff6600","IP":"#00eeff",
-  "دومين":"#cc44ff","ملف":"#ffdd00","رابط":"#00ff88",
-  "شخص":"#ff88aa","منظمة":"#4488ff"
-  };
-  saveTypeColors();
-}
-/** إعادة رسم محرر الألوان للأنواع **/
-function renderTypeColorsPanel() {
-  const $ = e=>document.getElementById('typeColorEdit');
-  if(!$) return;
-  let html='';
-  Object.entries(TYPE_COLOR).forEach(([t,c])=>{
-    html+=`<div class="type-color-row">
-      <label>${t}</label>
-      <input type="color" class="color-picker" value="${c}" onchange="setTypeColor('${t}',this.value)">
-    </div>`;
-  });
-  html+=`<button class="btn btn-secondary" style="margin:7px 0 0 0;" onclick="resetTypeColors()">استعادة الإفتراضي</button>`;
-  $.innerHTML=html;
-}
-function setTypeColor(t,c){ TYPE_COLOR[t]=c; saveTypeColors(); }
-/** —————————
-    NODES SCALE PER NODE
-—————————— **/
-function setNodeScale(id,scale){
-  let node=findNode(id); if(!node)return;
-  node.nodeScale=scale;
-  render();
-  saveTree();
-}
-/** ——————————————————
-    ———— INFINITE PAN / ZOOM
-    —————————————————— **/
-let isPanning=false, panStart={x:0,y:0}, origPan={x:0,y:0};
-/* main pan logic */
-function onPointerDown(e) {
-  if(e.target.closest && (e.target.closest('.settings-panel,.modal,.overlay,.ctx-menu,.link-popup'))) return;
-  isPanning=true;
-  panStart={x: getPointerX(e), y:getPointerY(e)};
-  origPan={x: panX, y: panY};
-}
-function onPointerMove(e) {
-  if(isPanning){
-    let dx=getPointerX(e)-panStart.x, dy=getPointerY(e)-panStart.y;
-    panX = origPan.x + dx;
-    panY = origPan.y + dy;
-    render();
+
+function getAllLinks(){
+  const all=[];
+  function walk(n){
+    if(n.links&&n.links.length){ n.links.forEach(l=>all.push({...l,nodeId:n.id,nodeName:n.name})); }
+    n.children.forEach(walk);
   }
+  if(root) walk(root);
+  return all;
 }
-function onPointerUp(e) { isPanning=false;}
-function getPointerX(e){ return e.touches?e.touches[0].clientX:e.clientX; }
-function getPointerY(e){ return e.touches?e.touches[0].clientY:e.clientY; }
-/* INFINITE: allow whatever panX/panY; render limits removed. */
-/* zoom --- using touch pinch/wheel (already supported on your version). */
-function onWheel(e) {
-  if(e.target.closest && (e.target.closest('.settings-panel,.modal,.overlay'))) return;
-  e.preventDefault();
-  const delta = e.deltaY > 0 ? 1/1.13 : 1.13;
-  setGlobalNodeScale(GLOBAL_NODE_SCALE*delta);
-  showNotif('تم تعديل حجم جميع العقد: '+Math.round(GLOBAL_NODE_SCALE*100)+'%');
-}
-function onTouchStart(e){
-  if(e.touches.length==2) {
-    isZoomPinch=true;
-    lastPinchDist=pinchDistance(e);
-    pinchInitNodeScale=GLOBAL_NODE_SCALE;
-  } else {onPointerDown(e);}
-}
-function onTouchMove(e){
-  if(isZoomPinch && e.touches.length==2){
-    let d=pinchDistance(e);
-    let ds = d/lastPinchDist;
-    setGlobalNodeScale(pinchInitNodeScale * ds);
-  } else {onPointerMove(e);}
-}
-function onTouchEnd(e){
-  if(isZoomPinch && e.touches.length<2) isZoomPinch=false;
-  onPointerUp(e);
-}
-function pinchDistance(e) {
-  let t0=e.touches[0], t1=e.touches[1];
-  return Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY);
-}
-let isZoomPinch=false, lastPinchDist=0, pinchInitNodeScale=GLOBAL_NODE_SCALE;
-/* —————————————————————————————————— */
-/* TYPING */
+
+// ══════════════════════════════════════════════════
+// TYPE CONFIG
+// ══════════════════════════════════════════════════
+const TYPE_COLOR={
+  هدف:'#ff2233', مشتبه:'#ff6600', IP:'#00eeff',
+  دومين:'#cc44ff', ملف:'#ffdd00', رابط:'#00ff88',
+  شخص:'#ff88aa', منظمة:'#4488ff'
+};
 const TYPE_ICON={
   هدف:'⬡', مشتبه:'◉', IP:'⊛', دومين:'⊕',
   ملف:'▣', رابط:'⊞', شخص:'⊙', منظمة:'⊟'
 };
-/* ——— LAYOUT ——— */
+
+// ══════════════════════════════════════════════════
+// LAYOUT
+// ══════════════════════════════════════════════════
 const LEVEL_H=115;
 const MIN_SEP=105;
+
 function layout(node,depth,x,y,w){
   node._x=x; node._y=y; node._depth=depth;
   const vis=node.collapsed?[]:node.children;
@@ -745,27 +881,21 @@ function layout(node,depth,x,y,w){
   const sx=x-total/2+cw/2;
   vis.forEach((c,i)=>layout(c,depth+1,sx+i*cw,y+LEVEL_H,cw*0.9));
 }
-/* ——— RENDER ——— */
+
+// ══════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════
 const svg=document.getElementById('treeCanvas');
 const linksG=document.getElementById('linksG');
 const nodesG=document.getElementById('nodesG');
 const NS='http://www.w3.org/2000/svg';
-function hexToRgb(h){
-  var r = parseInt(h.substring(1,3),16);
-  var g = parseInt(h.substring(3,5),16);
-  var b = parseInt(h.substring(5,7),16);
-  return r+','+g+','+b;
-}
-/* MAIN render: with node scale and colors */
+
 function render(){
-  // empty bg + arrow hint
-  document.getElementById('emptyState').classList.toggle('hidden',!!root);
-  if(document.getElementById('typeColorEdit')) renderTypeColorsPanel();
-  //
   const W=svg.clientWidth||window.innerWidth;
   const H=svg.clientHeight||window.innerHeight;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   linksG.innerHTML=''; nodesG.innerHTML='';
+  document.getElementById('emptyState').classList.toggle('hidden',!!root);
   if(!root){ updateStats(); renderMinimap(); return; }
   layout(root,0,W/2+panX,70+panY,W*0.9*zoom);
   renderLinks(root);
@@ -773,7 +903,7 @@ function render(){
   updateStats();
   renderMinimap();
 }
-/* WIDTH/HEIGHT—MINIMAP — ETC stay unchanged */
+
 function renderLinks(node){
   const vis=node.collapsed?[]:node.children;
   vis.forEach(child=>{
@@ -790,24 +920,42 @@ function renderLinks(node){
     path.setAttribute('filter','url(#neonRed)');
     path.setAttribute('stroke-dasharray',child.type==='رابط'?'6 3':'none');
     path.setAttribute('marker-end','url(#arrowRed)');
+    const pid='p'+Math.random().toString(36).slice(2);
+    path.setAttribute('id',pid);
     linksG.appendChild(path);
+
+    const circ=document.createElementNS(NS,'circle');
+    circ.setAttribute('r','2.5');
+    circ.setAttribute('fill',col);
+    circ.setAttribute('opacity','0.8');
+    circ.setAttribute('filter','url(#neonNode)');
+    const anim=document.createElementNS(NS,'animateMotion');
+    anim.setAttribute('dur',(1.4+Math.random()).toFixed(1)+'s');
+    anim.setAttribute('repeatCount','indefinite');
+    const mp=document.createElementNS(NS,'mpath');
+    mp.setAttributeNS('http://www.w3.org/1999/xlink','href','#'+pid);
+    anim.appendChild(mp);
+    circ.appendChild(anim);
+    linksG.appendChild(circ);
+
     renderLinks(child);
   });
 }
+
 function renderNodes(node){
   const col=TYPE_COLOR[node.type]||'#ff2233';
-  const isRoot=node._depth===0,isSel=node.id===selectedId;
-  // BASE R for type, allow global scaling, then node override
-  const baseR = isRoot?32:Math.max(17,26-node._depth*3);
-  const nodeScale = (typeof(node.nodeScale)=='number'?node.nodeScale:1)*GLOBAL_NODE_SCALE;
-  const r = baseR*nodeScale;
+  const isRoot=node._depth===0;
+  const isSel=node.id===selectedId;
+  const r=isRoot?32:Math.max(17,26-node._depth*3);
+
   const g=document.createElementNS(NS,'g');
   g.style.cursor='pointer';
+
   // Collapsed overlay
   if(node.collapsed&&node.children.length){
     const dim=document.createElementNS(NS,'circle');
     dim.setAttribute('cx',node._x); dim.setAttribute('cy',node._y);
-    dim.setAttribute('r',r+7);
+    dim.setAttribute('r',r+6);
     dim.setAttribute('fill',`rgba(${hexToRgb(col)},0.07)`);
     dim.setAttribute('stroke',col);
     dim.setAttribute('stroke-width','1');
@@ -815,373 +963,816 @@ function renderNodes(node){
     dim.setAttribute('opacity','0.5');
     g.appendChild(dim);
   }
+
   // Selection ring
   if(isSel){
     const ring=document.createElementNS(NS,'circle');
     ring.setAttribute('cx',node._x); ring.setAttribute('cy',node._y);
-    ring.setAttribute('r',r+12);
+    ring.setAttribute('r',r+14);
     ring.setAttribute('fill','none');
     ring.setAttribute('stroke',col);
-    ring.setAttribute('stroke-width','1.8');
+    ring.setAttribute('stroke-width','1');
     ring.setAttribute('stroke-dasharray','5 3');
-    ring.setAttribute('opacity','0.39');
+    ring.setAttribute('opacity','0.5');
     ring.setAttribute('filter','url(#neonNode)');
+    const animR=document.createElementNS(NS,'animateTransform');
+    animR.setAttribute('attributeName','transform');
+    animR.setAttribute('type','rotate');
+    animR.setAttribute('from',`0 ${node._x} ${node._y}`);
+    animR.setAttribute('to',`360 ${node._x} ${node._y}`);
+    animR.setAttribute('dur','9s'); animR.setAttribute('repeatCount','indefinite');
+    ring.appendChild(animR);
     g.appendChild(ring);
   }
+
   // Glow ring
   const glow=document.createElementNS(NS,'circle');
   glow.setAttribute('cx',node._x); glow.setAttribute('cy',node._y);
-  glow.setAttribute('r',r+3.5);
+  glow.setAttribute('r',r+4);
   glow.setAttribute('fill','none');
   glow.setAttribute('stroke',col);
-  glow.setAttribute('stroke-width',isSel?'2':'0.6');
-  glow.setAttribute('opacity',isSel?'0.45':'0.17');
+  glow.setAttribute('stroke-width',isSel?'2':'0.8');
+  glow.setAttribute('opacity',isSel?'0.65':'0.22');
   glow.setAttribute('filter','url(#neonNode)');
   g.appendChild(glow);
+
   // Main circle
   const circle=document.createElementNS(NS,'circle');
-  circle.setAttribute('cx',node._x);
-  circle.setAttribute('cy',node._y);
+  circle.setAttribute('cx',node._x); circle.setAttribute('cy',node._y);
   circle.setAttribute('r',r);
-  circle.setAttribute('fill',col);
+  circle.setAttribute('fill','rgba(4,4,7,0.94)');
+  circle.setAttribute('stroke',col);
+  circle.setAttribute('stroke-width',isSel?'2.5':'1.5');
   circle.setAttribute('filter','url(#neonNode)');
-  circle.setAttribute('opacity',isSel?'1':'0.86');
   g.appendChild(circle);
-  // ICON
-  const txt=document.createElementNS(NS,'text');
-  txt.setAttribute('x',node._x);txt.setAttribute('y',node._y+5);
-  txt.setAttribute('text-anchor','middle');
-  txt.setAttribute('dominant-baseline','middle');
-  txt.setAttribute('font-size',r*0.9);
-  txt.setAttribute('font-family','Share Tech Mono,monospace');
-  txt.setAttribute('fill','#fff');
-  txt.setAttribute('filter','url(#textGlow)');
-  txt.textContent=TYPE_ICON[node.type]||'⬡';
-  g.appendChild(txt);
-  // Name: يظهر فقط إذا ليست رابط أو يوجد اسم
-  if((node.type!=="رابط"||node.name)){
-    const t=document.createElementNS(NS,'text');
-    t.setAttribute('x',node._x); t.setAttribute('y',node._y+r+18);
-    t.setAttribute('text-anchor','middle');
-    t.setAttribute('font-size',Math.round(r*0.62));
-    t.setAttribute('font-family','Cairo,Arial,monospace');
-    t.setAttribute('fill','#bbb');
-    t.setAttribute('style','pointer-events:none;');
-    t.textContent=(node.name||'');
-    g.appendChild(t);
+
+  // Icon
+  const icon=document.createElementNS(NS,'text');
+  icon.setAttribute('x',node._x); icon.setAttribute('y',node._y-(isRoot?5:4));
+  icon.setAttribute('text-anchor','middle');
+  icon.setAttribute('dominant-baseline','middle');
+  icon.setAttribute('font-size',isRoot?'16':'13');
+  icon.setAttribute('fill',col);
+  icon.setAttribute('filter','url(#textGlow)');
+  icon.setAttribute('font-family','monospace');
+  icon.textContent=TYPE_ICON[node.type]||'⬡';
+  g.appendChild(icon);
+
+  // Label
+  const maxLen=12;
+  const lbl=node.name.length>maxLen?node.name.slice(0,maxLen-1)+'…':node.name;
+  const label=document.createElementNS(NS,'text');
+  label.setAttribute('x',node._x);
+  label.setAttribute('y',node._y+r+14);
+  label.setAttribute('text-anchor','middle');
+  label.setAttribute('dominant-baseline','middle');
+  label.setAttribute('font-size','11');
+  label.setAttribute('fill',col);
+  label.setAttribute('font-family',"'Cairo', sans-serif");
+  label.setAttribute('font-weight','600');
+  label.setAttribute('filter','url(#textGlow)');
+  label.setAttribute('opacity','0.9');
+  label.textContent=lbl;
+  g.appendChild(label);
+
+  // Type badge
+  const badge=document.createElementNS(NS,'text');
+  badge.setAttribute('x',node._x);
+  badge.setAttribute('y',node._y+r+27);
+  badge.setAttribute('text-anchor','middle');
+  badge.setAttribute('dominant-baseline','middle');
+  badge.setAttribute('font-size','8');
+  badge.setAttribute('fill',`rgba(${hexToRgb(col)},0.45)`);
+  badge.setAttribute('font-family',"'Share Tech Mono', monospace");
+  badge.textContent=node.type;
+  g.appendChild(badge);
+
+  // Link shortcuts badge (green dot) — opens popup
+  if(node.links&&node.links.length>0){
+    const lbx=node._x-r*0.72, lby=node._y-r*0.72;
+    const lbc=document.createElementNS(NS,'circle');
+    lbc.setAttribute('cx',lbx); lbc.setAttribute('cy',lby); lbc.setAttribute('r','9');
+    lbc.setAttribute('fill','rgba(0,255,136,0.15)');
+    lbc.setAttribute('stroke','rgba(0,255,136,0.7)'); lbc.setAttribute('stroke-width','1');
+    lbc.setAttribute('filter','url(#greenGlow)');
+    g.appendChild(lbc);
+    const lbt=document.createElementNS(NS,'text');
+    lbt.setAttribute('x',lbx); lbt.setAttribute('y',lby);
+    lbt.setAttribute('text-anchor','middle'); lbt.setAttribute('dominant-baseline','middle');
+    lbt.setAttribute('font-size','7'); lbt.setAttribute('font-family','monospace');
+    lbt.setAttribute('fill','#00ff88');
+    lbt.textContent='⊞'+node.links.length;
+    g.appendChild(lbt);
+    lbc.style.cursor='pointer';
+    lbt.style.cursor='pointer';
+    lbc.addEventListener('click',e=>{e.stopPropagation();showLinkPopup(e,node);});
+    lbt.addEventListener('click',e=>{e.stopPropagation();showLinkPopup(e,node);});
   }
-  // INTERACTION
-  g.addEventListener('mousedown',e=>{
-    e.stopPropagation();
-    onNodePointer(node,e);
-  });
+
+  // Children count badge
+  if(node.children.length>0){
+    const bx=node._x+r*0.72, by=node._y-r*0.72;
+    const bc=document.createElementNS(NS,'circle');
+    bc.setAttribute('cx',bx); bc.setAttribute('cy',by); bc.setAttribute('r','10');
+    bc.setAttribute('fill',node.collapsed?col:'rgba(0,0,0,0.85)');
+    bc.setAttribute('stroke',col); bc.setAttribute('stroke-width','1');
+    g.appendChild(bc);
+    const bt=document.createElementNS(NS,'text');
+    bt.setAttribute('x',bx); bt.setAttribute('y',by);
+    bt.setAttribute('text-anchor','middle'); bt.setAttribute('dominant-baseline','middle');
+    bt.setAttribute('font-size','8'); bt.setAttribute('font-family','monospace');
+    bt.setAttribute('fill',node.collapsed?'#000':col);
+    bt.textContent=node.collapsed?'+':node.children.length;
+    g.appendChild(bt);
+  }
+
+  // Inline link aliases display — clickable, opens directly in browser
+  if(node.links&&node.links.length>0){
+    node.links.forEach((lnk,li)=>{
+      const lt=document.createElementNS(NS,'text');
+      lt.setAttribute('x',node._x);
+      lt.setAttribute('y',node._y+r+38+(li*14));
+      lt.setAttribute('text-anchor','middle');
+      lt.setAttribute('dominant-baseline','middle');
+      lt.setAttribute('font-size','9');
+      lt.setAttribute('fill','rgba(0,255,136,0.85)');
+      lt.setAttribute('font-family',"'Share Tech Mono', monospace");
+      lt.setAttribute('filter','url(#greenGlow)');
+      lt.setAttribute('cursor','pointer');
+      lt.textContent='['+lnk.alias+']';
+      lt.addEventListener('click',e=>{
+        e.stopPropagation();
+        window.open(lnk.url,'_blank','noopener,noreferrer');
+        showNotif('⊞ فتح: '+lnk.alias);
+      });
+      g.appendChild(lt);
+    });
+  }
+
+  // Click: select. Double-click: toggle collapse. Long-press (mobile): ctx menu
+  g.addEventListener('click',e=>{e.stopPropagation();selectNode(node);});
+  g.addEventListener('dblclick',e=>{e.stopPropagation();toggleCollapse(node);});
+  g.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();selectNode(node);showCtxMenu(e.clientX,e.clientY);});
+  g.addEventListener('mouseenter',e=>showTooltip(e,node));
+  g.addEventListener('mouseleave',hideTooltip);
+
+  // Long press for mobile context menu
+  let pressTimer=null;
   g.addEventListener('touchstart',e=>{
-    e.stopPropagation();
-    onNodePointer(node,e);
-  });
+    pressTimer=setTimeout(()=>{
+      const t=e.touches[0];
+      selectNode(node);
+      showCtxMenu(t.clientX,t.clientY);
+    },600);
+  },{passive:true});
+  g.addEventListener('touchend',()=>clearTimeout(pressTimer),{passive:true});
+  g.addEventListener('touchmove',()=>clearTimeout(pressTimer),{passive:true});
+
   nodesG.appendChild(g);
-  if(!node.collapsed) node.children.forEach(renderNodes);
+  const vis=node.collapsed?[]:node.children;
+  vis.forEach(renderNodes);
 }
-function onNodePointer(n,e){
-  // رابط: لو ��انت نوع رابط، وانته رابط، وش اختصار
-  if(n.type==='رابط' && n.links.length){
-    window.open(n.links[0].url,"_blank");
-    showNotif('تم فتح الرابط');
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+// ══════════════════════════════════════════════════
+// LINK POPUP (click link badge → show links → click to open)
+// ══════════════════════════════════════════════════
+const linkPopup=document.getElementById('linkPopup');
+let linkPopupVisible=false;
+
+function showLinkPopup(e,node){
+  if(!node.links||!node.links.length) return;
+  // If only 1 link, open directly
+  if(node.links.length===1){
+    window.open(node.links[0].url,'_blank','noopener,noreferrer');
+    showNotif('⊞ فتح: '+node.links[0].alias);
     return;
   }
-  n.collapsed = !n.collapsed;
-  render();
-  saveTree();
+  const items=node.links.map(l=>`
+    <div class="link-popup-item" onclick="openLinkUrl('${escapeHtml(l.url)}','${escapeHtml(l.alias)}')">
+      <span class="link-popup-alias">⊞ ${escapeHtml(l.alias)}</span>
+      <span class="link-popup-url">${escapeHtml(l.url.slice(0,40))}${l.url.length>40?'…':''}</span>
+      <span class="link-popup-arrow">↗</span>
+    </div>
+  `).join('');
+  document.getElementById('linkPopupItems').innerHTML=items;
+  let x=e.clientX, y=e.clientY;
+  // Adjust to stay in viewport
+  linkPopup.style.left=x+'px'; linkPopup.style.top=y+'px';
+  linkPopup.classList.add('active');
+  linkPopupVisible=true;
+  // Adjust after render
+  setTimeout(()=>{
+    const r=linkPopup.getBoundingClientRect();
+    if(r.right>window.innerWidth) linkPopup.style.left=(x-r.width-8)+'px';
+    if(r.bottom>window.innerHeight) linkPopup.style.top=(y-r.height-8)+'px';
+  },0);
 }
-/* ———— ADDITIONAL ——— */
-function showNotif(txt){
-  const notif = document.getElementById('notif');
-  notif.textContent=txt;
-  notif.classList.add('show');
-  setTimeout(()=>notif.classList.remove('show'),1800);
+
+function openLinkUrl(url,alias){
+  window.open(url,'_blank','noopener,noreferrer');
+  showNotif('⊞ فتح: '+alias);
+  hideLinkPopup();
 }
-/* ========== PAN / ZOOM CONTROL EVENTS ============ */
-svg.addEventListener('mousedown',onPointerDown);
-window.addEventListener('mousemove',onPointerMove);
-window.addEventListener('mouseup',onPointerUp);
-svg.addEventListener('wheel',onWheel,{passive:false});
-svg.addEventListener('touchstart',onTouchStart,{passive:false});
-svg.addEventListener('touchmove',onTouchMove,{passive:false});
-svg.addEventListener('touchend',onTouchEnd,{passive:false});
-function centerView(){
-  panX=0; panY=0; render();
+
+function hideLinkPopup(){
+  linkPopup.classList.remove('active');
+  linkPopupVisible=false;
 }
-/* ============= SIDE PANEL HANDLERS =============== */
-let settingsPanelOpen = false;
-function toggleSettingsPanel(){
-  if(settingsPanelOpen) closeSettingsPanel();
-  else openSettingsPanel();
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-function openSettingsPanel(){
-  settingsPanelOpen = true;
-  document.getElementById('settingsPanel').classList.add('open');
-  document.getElementById('panelBackdrop').classList.add('show');
-  document.getElementById('settingsToggle').classList.add('active');
-  /* update node scale panel */
-  const node=findNode(selectedId);
-  if(node){
-    document.getElementById('singleNodeScale').value = node.nodeScale||1;
-    document.getElementById('singleNodeScaleValue').textContent = parseFloat(node.nodeScale||1).toFixed(2);
+
+document.addEventListener('click',e=>{
+  if(linkPopupVisible&&!linkPopup.contains(e.target)) hideLinkPopup();
+});
+
+// ══════════════════════════════════════════════════
+// MINIMAP
+// ══════════════════════════════════════════════════
+function renderMinimap(){
+  const mc=document.getElementById('minimapCanvas');
+  const mctx=mc.getContext('2d');
+  const mw=mc.parentElement.clientWidth;
+  const mh=mc.parentElement.clientHeight-18;
+  mc.width=mw; mc.height=mh;
+  mctx.clearRect(0,0,mw,mh);
+  mctx.fillStyle='rgba(4,4,7,0.5)'; mctx.fillRect(0,0,mw,mh);
+  if(!root) return;
+  const nodes=[];
+  function walk(n){
+    if(n._x!==undefined) nodes.push(n);
+    n.children.forEach(walk);
   }
+  walk(root);
+  if(!nodes.length) return;
+  const xs=nodes.map(n=>n._x), ys=nodes.map(n=>n._y);
+  const minX=Math.min(...xs),maxX=Math.max(...xs);
+  const minY=Math.min(...ys),maxY=Math.max(...ys);
+  const rangeX=Math.max(1,maxX-minX), rangeY=Math.max(1,maxY-minY);
+  const pad=10;
+  nodes.forEach(n=>{
+    const mx=pad+(n._x-minX)/(rangeX)*(mw-pad*2);
+    const my=pad+(n._y-minY)/(rangeY)*(mh-pad*2);
+    const col=TYPE_COLOR[n.type]||'#ff2233';
+    mctx.beginPath();
+    mctx.arc(mx,my,n._depth===0?3.5:2,0,Math.PI*2);
+    mctx.fillStyle=col+'cc'; mctx.fill();
+  });
 }
-function closeSettingsPanel(){
-  settingsPanelOpen = false;
-  document.getElementById('settingsPanel').classList.remove('open');
-  document.getElementById('panelBackdrop').classList.remove('show');
-  document.getElementById('settingsToggle').classList.remove('active');
-}
-function onSingleNodeScaleEdit(){
-  let val = parseFloat(document.getElementById('singleNodeScale').value);
-  document.getElementById('singleNodeScaleValue').textContent = val.toFixed(2);
-  setNodeScale(selectedId,val);
-  saveTree();
-}
-/* ——— FIND NODE ——— */
-function findNode(id,node){
-  if(!id||!(root)) return null;
-  if(!node) node=root;
-  if(node.id===id) return node;
-  for(let c of node.children||[]){ let f=findNode(id,c); if(f) return f; }
-  return null;
-}
-/* ========== TREE & STATE PERSISTENCE ============ */
-function saveTree(){
-  localStorage.setItem('c3_root',JSON.stringify(root));
-}
-function loadTree(){
-  let data=localStorage.getItem('c3_root');
-  if(data){
-    try{
-      root=JSON.parse(data);
-      if(root){
-        let mx=1;
-        walkIds(root,n=>{mx=Math.max(mx,n.id); n.nodeScale=n.nodeScale||1;});
-        uid=mx+1;
-      }
-    }catch(e){root=null;}
+
+// ══════════════════════════════════════════════════
+// PAN / ZOOM (Desktop + Touch)
+// ══════════════════════════════════════════════════
+const canvasWrap=document.getElementById('canvasWrap');
+
+canvasWrap.addEventListener('mousedown',e=>{
+  if(e.button===1||(e.button===0&&e.altKey)){
+    isPanning=true;
+    panStart={x:e.clientX-panX,y:e.clientY-panY};
+    canvasWrap.style.cursor='grabbing';
+    e.preventDefault();
   }
+});
+window.addEventListener('mousemove',e=>{
+  if(!isPanning) return;
+  panX=e.clientX-panStart.x;
+  panY=e.clientY-panStart.y;
   render();
-}
-function walkIds(node,fn){
-  fn(node);
-  for(const c of node.children||[]) walkIds(c,fn);
-}
-function resetTree(){
-  if(confirm('هل أنت متأكد أنك تريد حذف كل شيء؟')){
-    root=null;selectedId=null;
-    localStorage.removeItem('c3_root');
+});
+window.addEventListener('mouseup',()=>{ isPanning=false; canvasWrap.style.cursor='crosshair'; });
+
+svg.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const factor=e.deltaY>0?0.92:1.09;
+  zoom=Math.max(0.2,Math.min(5,zoom*factor));
+  document.getElementById('zoomPct').textContent=Math.round(zoom*100)+'%';
+  render();
+},{passive:false});
+
+// Touch support (pan + pinch)
+let lastTouches=null;
+let lastDist=null;
+
+canvasWrap.addEventListener('touchstart',e=>{
+  hideLinkPopup();
+  lastTouches=[...e.touches];
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    lastDist=Math.sqrt(dx*dx+dy*dy);
+  }
+},{passive:true});
+
+canvasWrap.addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&lastTouches&&lastTouches.length===1){
+    const dx=e.touches[0].clientX-lastTouches[0].clientX;
+    const dy=e.touches[0].clientY-lastTouches[0].clientY;
+    panX+=dx; panY+=dy;
+    render();
+  } else if(e.touches.length===2&&lastTouches&&lastTouches.length>=2){
+    // Pan
+    const cxNew=(e.touches[0].clientX+e.touches[1].clientX)/2;
+    const cyNew=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    const cxOld=(lastTouches[0].clientX+lastTouches[1].clientX)/2;
+    const cyOld=(lastTouches[0].clientY+lastTouches[1].clientY)/2;
+    panX+=cxNew-cxOld; panY+=cyNew-cyOld;
+    // Pinch zoom
+    const dxN=e.touches[0].clientX-e.touches[1].clientX;
+    const dyN=e.touches[0].clientY-e.touches[1].clientY;
+    const newDist=Math.sqrt(dxN*dxN+dyN*dyN);
+    if(lastDist&&lastDist>0){
+      const factor=newDist/lastDist;
+      zoom=Math.max(0.2,Math.min(5,zoom*factor));
+      document.getElementById('zoomPct').textContent=Math.round(zoom*100)+'%';
+    }
+    lastDist=newDist;
     render();
   }
+  lastTouches=[...e.touches];
+},{passive:true});
+
+canvasWrap.addEventListener('touchend',e=>{
+  lastTouches=e.touches.length>0?[...e.touches]:null;
+  lastDist=null;
+},{passive:true});
+
+svg.addEventListener('click',e=>{
+  if(e.target===svg||e.target.tagName==='svg'){
+    selectedId=null; updateInfo(); render();
+  }
+  hideCtxMenu();
+});
+
+function zoomIn(){ zoom=Math.min(5,zoom*1.15); document.getElementById('zoomPct').textContent=Math.round(zoom*100)+'%'; render(); }
+function zoomOut(){ zoom=Math.max(0.2,zoom*0.88); document.getElementById('zoomPct').textContent=Math.round(zoom*100)+'%'; render(); }
+
+// ══════════════════════════════════════════════════
+// SELECTION & INFO
+// ══════════════════════════════════════════════════
+function selectNode(node){
+  selectedId=node.id;
+  currentType=node.type;
+  updateTypeGrid();
+  updateInfo(node);
+  render();
+  // Show badge indicator
+  document.getElementById('settingsBadge').classList.add('show');
+  setTimeout(()=>document.getElementById('settingsBadge').classList.remove('show'),3000);
 }
-function exportData(){
-  const blob = new Blob([JSON.stringify(root||{})],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='cyber_tree.json';a.click();
+
+function updateInfo(node){
+  const box=document.getElementById('infoBox');
+  if(!node){
+    box.innerHTML='<span class="hl">[ في الانتظار ]</span><br>لا توجد عقدة محددة<br><span style="color:#304050;font-size:0.62rem">اضغط على عقدة لعرض بياناتها</span>';
+    return;
+  }
+  const col=TYPE_COLOR[node.type]||'#ff2233';
+  const linksHtml=node.links&&node.links.length?
+    '<br><span class="hl3">اختصارات:</span> '+node.links.map(l=>`<span style="color:#00ff88;cursor:pointer;text-decoration:underline;" onclick="window.open('${escapeHtml(l.url)}','_blank','noopener,noreferrer');showNotif('⊞ فتح: ${escapeHtml(l.alias)}')">${escapeHtml(l.alias)}</span>`).join(' • ')
+    :'';
+  box.innerHTML=`
+    <span class="hl" style="color:${col}">${TYPE_ICON[node.type]||'⬡'} ${escapeHtml(node.name)}</span><br>
+    <span class="hl2">النوع:</span> ${node.type}<br>
+    <span class="hl2">العمق:</span> ${node._depth??'-'}<br>
+    <span class="hl2">الفروع:</span> ${node.children.length}
+    ${node.note?`<br><span style="color:#607080;font-size:0.62rem">${escapeHtml(node.note)}</span>`:''}
+    ${linksHtml}
+  `;
 }
-function importData(){
-  document.getElementById('importFile').click();
+
+function updateTypeGrid(){
+  document.querySelectorAll('.type-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.type===currentType);
+  });
 }
-function handleImport(e){
-  const file = e.target.files[0];
-  if(!file)return;
-  const r = new FileReader();
-  r.onload=()=>{
-    try{root=JSON.parse(r.result);saveTree();render();}
-    catch(e){alert('خطأ في جلب البيانات');}
-  };
-  r.readAsText(file);
+
+document.querySelectorAll('.type-btn').forEach(b=>{
+  b.addEventListener('click',()=>{ currentType=b.dataset.type; updateTypeGrid(); });
+});
+
+// ══════════════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════════════
+function countNodes(n){ return 1+n.children.reduce((s,c)=>s+countNodes(c),0); }
+function maxDepth(n,d=0){ return n.children.reduce((m,c)=>Math.max(m,maxDepth(c,d+1)),d); }
+function countAllLinks(n){ return (n.links?n.links.length:0)+n.children.reduce((s,c)=>s+countAllLinks(c),0); }
+
+function updateStats(){
+  if(!root){
+    document.getElementById('chipNodes').textContent='عقد: 0';
+    document.getElementById('chipDepth').textContent='عمق: 0';
+    document.getElementById('chipLinks').textContent='روابط: 0';
+    return;
+  }
+  document.getElementById('chipNodes').textContent='عقد: '+countNodes(root);
+  document.getElementById('chipDepth').textContent='عمق: '+(maxDepth(root)+1);
+  document.getElementById('chipLinks').textContent='روابط: '+countAllLinks(root);
+  updateGlobalLinkList();
 }
-/* ——— NODE ADD / EDIT ——— */
+
+function updateGlobalLinkList(){
+  const list=document.getElementById('globalLinkList');
+  const all=getAllLinks();
+  if(!all.length){
+    list.innerHTML='<div class="link-empty">لا توجد اختصارات بعد</div>';
+    return;
+  }
+  list.innerHTML=all.map(l=>`
+    <div class="link-item" onclick="window.open('${escapeHtml(l.url)}','_blank','noopener,noreferrer');showNotif('⊞ فتح: ${escapeHtml(l.alias)}')">
+      <span class="link-item-alias">⊞ ${escapeHtml(l.alias)}</span>
+      <span style="font-family:var(--mono);font-size:0.58rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;flex:1;">${l.url.slice(0,28)}…</span>
+      <span style="color:rgba(0,255,136,0.4);font-size:0.8rem;flex-shrink:0;">↗</span>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════
+// FIND
+// ══════════════════════════════════════════════════
+function find(node,id){
+  if(!node) return null;
+  if(node.id===id) return node;
+  for(const c of node.children){ const r=find(c,id); if(r) return r; }
+  return null;
+}
+function findParent(node,id){
+  if(!node) return null;
+  for(const c of node.children){ if(c.id===id) return node; const r=findParent(c,id); if(r) return r; }
+  return null;
+}
+
+// ══════════════════════════════════════════════════
+// MODAL: ADD/EDIT NODE
+// ══════════════════════════════════════════════════
 function openAdd(){
-  modalMode='add';
+  if(!root&&selectedId===null){ modalMode='addroot'; }
+  else if(selectedId===null&&root){ selectedId=root.id; modalMode='add'; }
+  else { modalMode='add'; }
+  document.getElementById('modalTitle').textContent='// إضافة عقدة';
   document.getElementById('inpName').value='';
-  document.getElementById('inpType').value=currentType;
   document.getElementById('inpNote').value='';
+  document.getElementById('inpType').value=currentType;
+  document.getElementById('inpLinkAlias').value='';
+  document.getElementById('inpLinkUrl').value='';
   modalLinks=[];
   renderModalLinks();
-  document.getElementById('overlay').style.display='flex';
+  document.getElementById('overlay').classList.add('active');
+  setTimeout(()=>document.getElementById('inpName').focus(),80);
 }
-  window.openAdd = openAdd;
+
 function openEdit(){
-  if(!selectedId) return showNotif('حدد عقدة أولاً!');
-  modalMode='edit';
-  let node=findNode(selectedId);
+  if(!selectedId) { showNotif('اختر عقدة أولاً'); return; }
+  const node=find(root,selectedId);
   if(!node) return;
+  modalMode='edit';
+  document.getElementById('modalTitle').textContent='// تعديل العقدة';
   document.getElementById('inpName').value=node.name;
-  document.getElementById('inpType').value=node.type;
   document.getElementById('inpNote').value=node.note||'';
-  modalLinks=node.links?JSON.parse(JSON.stringify(node.links)):[];
+  document.getElementById('inpType').value=node.type;
+  document.getElementById('inpLinkAlias').value='';
+  document.getElementById('inpLinkUrl').value='';
+  modalLinks=[...(node.links||[])];
   renderModalLinks();
-  document.getElementById('overlay').style.display='flex';
+  document.getElementById('overlay').classList.add('active');
+  setTimeout(()=>document.getElementById('inpName').focus(),80);
 }
-function closeModal(){
-  document.getElementById('overlay').style.display='none';
-}
-function confirmModal(){
-  // validation — اسم فارغ فقط إذا رابط ويوجد اختصار!
-  let name = document.getElementById('inpName').value.trim();
-  let type = document.getElementById('inpType').value;
-  let note = document.getElementById('inpNote').value.trim();
-  if(type!=="رابط" && !name) return alert('الاسم مطلوب!');
-  if(type==="رابط" && !name && !modalLinks.length) return alert('الاختصار أو الرابط مطلوب!');
-  if(modalMode==='add'){
-    let n=mkNode(name,type,note,selectedId);
-    n.links=modalLinks.length?JSON.parse(JSON.stringify(modalLinks)):[];
-    if(!root){root=n;}
-    else{
-      let par=findNode(selectedId)||root;
-      n.parentId=par.id;
-      par.children.push(n);
-    }
-    selectedId=n.id;
-  }
-  else if(modalMode==='edit'){
-    let n=findNode(selectedId);
-    n.name=name;
-    n.type=type;
-    n.note=note;
-    n.links=modalLinks.length?JSON.parse(JSON.stringify(modalLinks)):[];
-  }
-  saveTree();render();closeModal();
-}
-function renderModalLinks(){
-  let html='';
-  modalLinks.forEach((l,i)=>{
-    html+=`<div class="modal-link-item">
-      <span class="modal-link-alias">${l.alias}</span>
-      <span class="modal-link-url">${l.url}</span>
-      <span class="modal-link-del" onclick="removeLinkFromModal(${i})">✕</span>
-    </div>`;
-  });
-  document.getElementById('modalLinksList').innerHTML=html;
-}
+
+function closeModal(){ document.getElementById('overlay').classList.remove('active'); }
+
 function addLinkToModal(){
   const alias=document.getElementById('inpLinkAlias').value.trim();
   const url=document.getElementById('inpLinkUrl').value.trim();
-  if(alias===''&&!url) return;
+  if(!alias||!url){ showNotif('أدخل الاختصار والرابط'); return; }
+  if(!url.startsWith('http')){ showNotif('يجب أن يبدأ الرابط بـ http'); return; }
+  if(modalLinks.some(l=>l.alias===alias)){ showNotif('الاختصار مستخدم بالفعل'); return; }
   modalLinks.push({alias,url});
   document.getElementById('inpLinkAlias').value='';
   document.getElementById('inpLinkUrl').value='';
   renderModalLinks();
+  showNotif('تمت إضافة: '+alias);
 }
-function removeLinkFromModal(idx){
-  modalLinks.splice(idx,1); renderModalLinks();
+
+function renderModalLinks(){
+  const container=document.getElementById('modalLinksList');
+  if(!modalLinks.length){ container.innerHTML='<div class="link-empty">لا توجد اختصارات</div>'; return; }
+  container.innerHTML=modalLinks.map((l,i)=>`
+    <div class="modal-link-item">
+      <span class="modal-link-alias" style="cursor:pointer;" onclick="window.open('${escapeHtml(l.url)}','_blank','noopener,noreferrer')">⊞ ${escapeHtml(l.alias)} ↗</span>
+      <span class="modal-link-url">${escapeHtml(l.url)}</span>
+      <span class="modal-link-del" onclick="removeModalLink(${i})">✕</span>
+    </div>
+  `).join('');
 }
-/* ——— NODE DELETE ——— */
-function deleteSelected(){
-  if(!selectedId) return showNotif('حدد عقدة أولاً');
-  if(confirm('حذف العقدة وكل الفروع؟')){
-    if(root.id===selectedId){ root=null;selectedId=null; }
-    else{
-      function _del(node){
-        node.children = node.children.filter(c=>c.id!==selectedId);
-        node.children.forEach(_del);
-      }
-      _del(root);
-      selectedId=null;
-    }
-    saveTree();render();
+
+function removeModalLink(i){ modalLinks.splice(i,1); renderModalLinks(); }
+
+function confirmModal(){
+  const name=document.getElementById('inpName').value.trim();
+  const type=document.getElementById('inpType').value;
+  const note=document.getElementById('inpNote').value.trim();
+  if(!name){ showNotif('أدخل اسم العقدة'); return; }
+
+  if(modalMode==='addroot'){
+    root=mkNode(name,type,note);
+    root.links=[...modalLinks];
+    root.collapsed=false;
+    selectedId=root.id;
+  } else if(modalMode==='add'){
+    const parent=selectedId?find(root,selectedId):root;
+    if(!parent) return;
+    const n=mkNode(name,type,note,parent.id);
+    n.links=[...modalLinks];
+    n.collapsed=false;
+    parent.children.push(n);
+    parent.collapsed=false;
+    selectedId=n.id;
+    pulseScreen();
+  } else if(modalMode==='edit'){
+    const node=find(root,selectedId);
+    if(!node) return;
+    node.name=name; node.type=type; node.note=note;
+    node.links=[...modalLinks];
+    currentType=type;
   }
+  closeModal(); render();
+  if(selectedId) updateInfo(find(root,selectedId));
+  updateTypeGrid();
 }
-/* ——— EXPAND/COLLAPSE ——— */
-function expandAll(){
-  function walk(n){ n.collapsed=false;n.children.forEach(walk);}
-  if(root) walk(root),render();
+
+// ══════════════════════════════════════════════════
+// LINK MANAGER (for existing nodes)
+// ══════════════════════════════════════════════════
+let lmNodeId=null;
+
+function openNodeLinks(node){
+  lmNodeId=node.id;
+  document.getElementById('lmNodeName').textContent=node.name;
+  document.getElementById('lmAlias').value='';
+  document.getElementById('lmUrl').value='';
+  renderLmLinks();
+  document.getElementById('overlayLinks').classList.add('active');
 }
-function collapseAll(){
-  function walk(n){ n.collapsed=true;n.children.forEach(walk);}
-  if(root) walk(root),render();
+
+function openLinkManager(){
+  if(!selectedId){ showNotif('اختر عقدة أولاً'); return; }
+  const node=find(root,selectedId);
+  if(!node) return;
+  openNodeLinks(node);
 }
-/* ============== SIDEPANEL/INFO/SELECTIONS ================ */
-function updateStats(){
-  // total nodes,tree depth
-  let nodec=0, maxd=0, linkc=0;
-  function walk(n,d){
-    nodec++; maxd=Math.max(maxd,d);
-    linkc+=(n.links||[]).length;
-    (n.children||[]).forEach(c=>walk(c,d+1));
-  }
-  if(root) walk(root,1);
-  document.getElementById('chipNodes').textContent="عقد: "+nodec;
-  document.getElementById('chipDepth').textContent="عمق: "+maxd;
-  document.getElementById('chipLinks').textContent="روابط: "+linkc;
-  // info panel
-  let node=findNode(selectedId);
-  let infoBox = document.getElementById('infoBox');
-  if(!node){
-    infoBox.innerHTML='<span class="hl">[ في الانتظار ]</span><br>لا توجد عقدة محددة<br><span style="color:#304050;font-size:0.62rem">اضغط على عقدة لعرض بياناتها</span>';
-    document.getElementById('singleNodeScale').value = 1;
-    document.getElementById('singleNodeScaleValue').textContent = '1';
-    return;
-  }
-  let info = `<span class="hl">${node.name||'---'}</span><br>`;
-  info += `النوع: <span class="hl2">${node.type}</span><br>`;
-  info += `ملاحظات:<br>${node.note||'---'}`;
-  infoBox.innerHTML=info;
-  document.getElementById('singleNodeScale').value = node.nodeScale||1;
-  document.getElementById('singleNodeScaleValue').textContent = (node.nodeScale||1).toFixed(2);
-}
-function renderMinimap(){
-  const mini = document.getElementById('minimapCanvas');
-  const W=138,H=80;
-  mini.width=W;mini.height=H;
-  const ctx = mini.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-  if(!root)return;
-  function walk(n){
-    ctx.beginPath();
-    ctx.arc(W/2+(n._x-window.innerWidth/2)*.15,H/2+(n._y-80)*.17, 7,.6,7);
-    ctx.fillStyle=TYPE_COLOR[n.type]||'#fff';
-    ctx.globalAlpha=0.35; ctx.fill();
-    ctx.globalAlpha=1.0;
-    n.children.forEach(walk);
-  }
-  walk(root);
-}
-window.addEventListener('click',function(e){
-  if(!e.target.closest('.settings-panel,.modal,.overlay,.ctx-menu,.fab-add')){
-    selectedId=null; updateStats(); render();
-  }
-});
-/* =============== SHORTCUTS =============== */
-window.addEventListener('keydown',e=>{
-  if(e.target.matches('input,textarea,select'))return;
-  if(e.code==='KeyN') openAdd();
-  if(e.code==='KeyE') openEdit();
-  if(e.code==='Delete') deleteSelected();
-  if(e.code==='KeyC'){ let n=findNode(selectedId); if(n){n.collapsed=!n.collapsed;render();saveTree();} }
-  if(e.code==='Space'){ centerView(); e.preventDefault();}
-  if(e.code==='Escape'){ selectedId=null;render(); }
-  // حجم العقد عبر الشيفت +
-  if(e.code==='Equal' && e.shiftKey){ scaleNodes(1.13);}
-  if(e.code==='Minus' && e.shiftKey){ scaleNodes(1/1.13);}
-});
-/* ===== رابط فقط (نافذة) ===== */
-function handleNodeClick(e,node){
-  if(node.type==='رابط' && node.links && node.links.length){
-    window.open(node.links[0].url,"_blank");
-    return;
-  }
-  selectedId=node.id;
+
+function closeLinkManager(){
+  document.getElementById('overlayLinks').classList.remove('active');
   render();
+  if(selectedId) updateInfo(find(root,selectedId));
+}
+
+function renderLmLinks(){
+  const node=find(root,lmNodeId);
+  const container=document.getElementById('lmLinksList');
+  if(!node||!node.links||!node.links.length){
+    container.innerHTML='<div class="link-empty">لا توجد اختصارات لهذه العقدة</div>';
+    return;
+  }
+  container.innerHTML=node.links.map((l,i)=>`
+    <div class="modal-link-item">
+      <span class="modal-link-alias" style="cursor:pointer;text-decoration:underline;" onclick="window.open('${escapeHtml(l.url)}','_blank','noopener,noreferrer');showNotif('⊞ فتح: ${escapeHtml(l.alias)}')">⊞ ${escapeHtml(l.alias)} ↗</span>
+      <span class="modal-link-url">${escapeHtml(l.url)}</span>
+      <span class="modal-link-del" onclick="deleteLmLink(${i})">✕</span>
+    </div>
+  `).join('');
+}
+
+function deleteLmLink(i){
+  const node=find(root,lmNodeId);
+  if(!node) return;
+  node.links.splice(i,1);
+  renderLmLinks();
   updateStats();
 }
-/* ——— عند تغير نوع العقدة في نافذة التعديل – حجب اسم العقدة اذا رابط ——— */
-document.getElementById('inpType').addEventListener('change',function(){
-  const val=this.value;
-  const inpName=document.getElementById('inpName');
-  if(val==='رابط'){ inpName.placeholder='(يُسمح بالفراغ فقط لو اختصار)'; }
-  else{ inpName.placeholder='اسم العقدة...'; }
+
+function addLinkFromManager(){
+  const alias=document.getElementById('lmAlias').value.trim();
+  const url=document.getElementById('lmUrl').value.trim();
+  if(!alias||!url){ showNotif('أدخل الاختصار والرابط'); return; }
+  if(!url.startsWith('http')){ showNotif('يجب أن يبدأ الرابط بـ http'); return; }
+  const node=find(root,lmNodeId);
+  if(!node) return;
+  if(!node.links) node.links=[];
+  if(node.links.some(l=>l.alias===alias)){ showNotif('الاختصار موجود بالفعل'); return; }
+  node.links.push({alias,url});
+  document.getElementById('lmAlias').value='';
+  document.getElementById('lmUrl').value='';
+  renderLmLinks();
+  updateStats();
+  showNotif('تمت إضافة: '+alias);
+}
+
+// ══════════════════════════════════════════════════
+// COLLAPSE — Inherited (parent closed → all descendants closed)
+// ══════════════════════════════════════════════════
+function toggleCollapse(node){
+  if(node.children.length===0) return;
+  if(!node.collapsed){
+    // Close: recursively mark all descendants collapsed
+    collapseNodeDeep(node);
+    node.collapsed=true;
+  } else {
+    // Open: only open this node, children stay as-is (collapsed)
+    node.collapsed=false;
+    // Children remain collapsed — user must open them manually
+  }
+  render();
+}
+
+function collapseNodeDeep(node){
+  node.children.forEach(c=>{
+    c.collapsed=true;
+    collapseNodeDeep(c);
+  });
+}
+
+function expandAll(){
+  if(!root) return;
+  function w(n){ n.collapsed=false; n.children.forEach(w); }
+  w(root); render();
+}
+
+function collapseAll(){
+  if(!root) return;
+  function w(n,d){ if(d>0) n.collapsed=true; n.children.forEach(c=>w(c,d+1)); }
+  w(root,0); render();
+}
+
+// ══════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════
+function centerView(){ panX=0; panY=0; zoom=1; document.getElementById('zoomPct').textContent='100%'; render(); }
+
+function deleteSelected(){
+  if(!selectedId) { showNotif('اختر عقدة أولاً'); return; }
+  if(root&&selectedId===root.id){ root=null; selectedId=null; updateInfo(); render(); return; }
+  const par=findParent(root,selectedId);
+  if(!par) return;
+  par.children=par.children.filter(c=>c.id!==selectedId);
+  selectedId=par.id;
+  updateInfo(par); render();
+}
+
+function resetTree(){
+  if(!confirm('إعادة ضبط الشجرة كاملاً؟ سيتم حذف جميع البيانات.')) return;
+  root=null; selectedId=null; uid=1;
+  panX=0; panY=0; zoom=1;
+  updateInfo(); render();
+  showNotif('تم إعادة ضبط الشجرة');
+}
+
+function pulseScreen(){
+  const flash=document.createElement('div');
+  flash.style.cssText='position:fixed;inset:0;z-index:500;pointer-events:none;background:rgba(255,34,51,0.05);animation:flashOut 0.5s forwards';
+  const st=document.createElement('style');
+  st.textContent='@keyframes flashOut{from{opacity:1}to{opacity:0}}';
+  document.head.appendChild(st);
+  document.body.appendChild(flash);
+  setTimeout(()=>{ flash.remove(); st.remove(); },600);
+}
+
+// ══════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════
+function exportData(){
+  if(!root){ showNotif('لا توجد بيانات للتصدير'); return; }
+  const data=JSON.stringify({root,uid},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='cyber-tree-'+Date.now()+'.json';
+  a.click();
+  showNotif('تم تصدير البيانات');
+}
+
+function importData(){ document.getElementById('importFile').click(); }
+
+function handleImport(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(data.root){ root=data.root; uid=data.uid||uid; selectedId=null; render(); showNotif('تم استيراد البيانات'); }
+    } catch(err){ showNotif('خطأ في قراءة الملف'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+// ══════════════════════════════════════════════════
+// CONTEXT MENU
+// ══════════════════════════════════════════════════
+const ctxMenu=document.getElementById('ctxMenu');
+function showCtxMenu(x,y){
+  // Adjust to stay in viewport
+  ctxMenu.style.left=x+'px'; ctxMenu.style.top=y+'px';
+  ctxMenu.classList.add('active');
+  setTimeout(()=>{
+    const r=ctxMenu.getBoundingClientRect();
+    if(r.right>window.innerWidth) ctxMenu.style.left=(x-r.width-4)+'px';
+    if(r.bottom>window.innerHeight) ctxMenu.style.top=(y-r.height-4)+'px';
+  },0);
+}
+function hideCtxMenu(){ ctxMenu.classList.remove('active'); }
+function ctxAdd(){ hideCtxMenu(); openAdd(); }
+function ctxEdit(){ hideCtxMenu(); openEdit(); }
+function ctxCollapse(){ hideCtxMenu(); const n=find(root,selectedId); if(n) toggleCollapse(n); }
+function ctxDelete(){ hideCtxMenu(); deleteSelected(); }
+function ctxOpenLinks(){ hideCtxMenu(); openLinkManager(); }
+document.addEventListener('click',hideCtxMenu);
+
+// ══════════════════════════════════════════════════
+// TOOLTIP
+// ══════════════════════════════════════════════════
+const tooltip=document.getElementById('tooltip');
+function showTooltip(e,node){
+  document.getElementById('ttName').textContent=node.name;
+  document.getElementById('ttType').textContent='[ '+node.type+' ]';
+  document.getElementById('ttNote').textContent=node.note||'';
+  const linksEl=document.getElementById('ttLinks');
+  if(node.links&&node.links.length){
+    linksEl.textContent='⊞ اختصارات: '+node.links.map(l=>l.alias).join(' • ');
+  } else { linksEl.textContent=''; }
+  tooltip.classList.add('show');
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  let x=e.clientX+14, y=e.clientY+14;
+  if(x+270>innerWidth) x=e.clientX-270;
+  if(y+120>innerHeight) y=e.clientY-120;
+  tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
+}
+function hideTooltip(){ tooltip.classList.remove('show'); }
+document.addEventListener('mousemove',e=>{ if(tooltip.classList.contains('show')) moveTooltip(e); });
+
+// ══════════════════════════════════════════════════
+// NOTIFICATION
+// ══════════════════════════════════════════════════
+let notifTimer=null;
+function showNotif(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg; n.classList.add('show');
+  if(notifTimer) clearTimeout(notifTimer);
+  notifTimer=setTimeout(()=>n.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  const inModal=document.getElementById('overlay').classList.contains('active');
+  const inLinks=document.getElementById('overlayLinks').classList.contains('active');
+  if(inModal){
+    if(e.key==='Enter'&&!e.shiftKey) confirmModal();
+    if(e.key==='Escape') closeModal();
+    return;
+  }
+  if(inLinks){ if(e.key==='Escape') closeLinkManager(); return; }
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(e.key==='n'||e.key==='N') openAdd();
+  if(e.key==='e'||e.key==='E') openEdit();
+  if(e.key==='c'||e.key==='C'){ const n=find(root,selectedId); if(n) toggleCollapse(n); }
+  if(e.key==='Delete'||e.key==='Backspace') deleteSelected();
+  if(e.key===' '){ e.preventDefault(); centerView(); }
+  if(e.key==='Escape'){
+    closeSettingsPanel();
+    hideLinkPopup();
+    selectedId=null; updateInfo(); render();
+  }
+  if(e.key==='+'||e.key==='='){ zoomIn(); }
+  if(e.key==='-'){ zoomOut(); }
+  if((e.key==='s'||e.key==='S')&&!e.ctrlKey&&!e.metaKey){ toggleSettingsPanel(); }
 });
-/* ——— الوان الانواع ========= */
-renderTypeColorsPanel();
-/* ——— تحميل الشجرة تلقائياً ——— */
-window.onload=()=>{ loadTree(); renderTypeColorsPanel(); };
+
+// ══════════════════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════════════════
+window.addEventListener('resize',()=>{ render(); });
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+// Collapse drag hint after a moment on mobile
+setTimeout(()=>{
+  const hint=document.getElementById('dragHint');
+  if(hint) hint.style.opacity='0';
+},6000);
+
+render();
 </script>
 </body>
 </html>
