@@ -1006,6 +1006,7 @@ function openAdd(){
   renderModalLinks();
   document.getElementById('overlay').style.display='flex';
 }
+  window.openAdd = openAdd;
 function openEdit(){
   if(!selectedId) return showNotif('حدد عقدة أولاً!');
   modalMode='edit';
