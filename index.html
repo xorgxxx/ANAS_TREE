@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>شجرة التحقيق السيبراني v3</title>
+<title>شجرة التحقيق السيبراني v0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -493,6 +493,65 @@ header {
 }
 .lm-form-label{font-family:var(--mono);font-size:0.58rem;color:rgba(255,34,51,0.5);letter-spacing:2px;margin-bottom:7px;}
 
+/* ═══ TRANSFER MODAL ═══ */
+.transfer-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.ttab{
+  flex:1;padding:8px 4px;font-family:var(--mono);font-size:0.7rem;letter-spacing:1px;
+  background:transparent;border:1px solid rgba(255,34,51,0.2);color:var(--text-dim);
+  border-radius:4px;cursor:pointer;transition:all 0.2s;
+}
+.ttab.active{
+  border-color:var(--green);color:var(--green);
+  background:rgba(0,255,136,0.06);
+  box-shadow:0 0 8px rgba(0,255,136,0.15);
+}
+.ttab:hover:not(.active){color:var(--text);border-color:rgba(255,34,51,0.4);}
+.transfer-panel{}
+.transfer-info-box{
+  font-size:0.68rem;color:var(--text-dim);line-height:1.6;
+  background:rgba(255,34,51,0.04);border:1px solid rgba(255,34,51,0.15);
+  border-radius:4px;padding:10px 12px;margin-bottom:14px;
+}
+.pass-row{display:flex;gap:6px;align-items:center;}
+.pass-row input{flex:1;}
+.pass-eye{
+  background:rgba(255,34,51,0.08);border:1px solid rgba(255,34,51,0.2);
+  color:var(--text);padding:6px 10px;border-radius:4px;cursor:pointer;font-size:1rem;
+  transition:background 0.15s;
+}
+.pass-eye:hover{background:rgba(255,34,51,0.18);}
+.token-box{
+  font-family:var(--mono);font-size:0.6rem;color:var(--green);
+  background:rgba(0,0,0,0.5);border:1px solid rgba(0,255,136,0.2);
+  border-radius:4px;padding:10px;word-break:break-all;
+  max-height:110px;overflow-y:auto;line-height:1.5;
+  letter-spacing:0.5px;
+  scrollbar-width:thin;scrollbar-color:rgba(0,255,136,0.3) transparent;
+}
+.token-actions{display:flex;gap:8px;margin-top:10px;}
+.token-meta{
+  margin-top:8px;font-family:var(--mono);font-size:0.6rem;
+  color:var(--text-dim);line-height:1.7;
+  border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;
+}
+.import-status{
+  font-family:var(--mono);font-size:0.68rem;padding:8px 12px;
+  border-radius:4px;display:none;
+}
+.import-status.ok{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.25);color:var(--green);}
+.import-status.err{background:rgba(255,34,51,0.08);border:1px solid rgba(255,34,51,0.3);color:var(--red);}
+
+/* ═══ LOCALSTORAGE STATUS BADGE ═══ */
+.ls-badge{
+  position:fixed;bottom:18px;left:18px;z-index:80;
+  font-family:var(--mono);font-size:0.58rem;letter-spacing:1.5px;
+  background:rgba(0,0,0,0.75);border:1px solid rgba(0,255,136,0.2);
+  color:rgba(0,255,136,0.5);padding:4px 10px;border-radius:3px;
+  pointer-events:none;transition:opacity 0.4s;
+}
+.ls-badge.saving{color:var(--yellow);border-color:rgba(255,221,0,0.3);}
+.ls-badge.saved{color:rgba(0,255,136,0.7);border-color:rgba(0,255,136,0.25);}
+
 </style>
 </head>
 <body>
@@ -507,7 +566,7 @@ header {
     <div class="logo-hex">SYS</div>
     <div class="header-titles">
       <div class="header-title">CYBER INTEL // شجرة التحقيق</div>
-      <div class="header-sub">نظام التحقيق السيبراني • v3.0</div>
+      <div class="header-sub">نظام التحقيق السيبراني • v4.0 — Encrypted Transfer</div>
     </div>
   </div>
   <div class="header-right">
@@ -587,6 +646,9 @@ header {
 
 </div><!-- /main -->
 
+<!-- LOCAL STORAGE STATUS -->
+<div class="ls-badge saved" id="lsBadge">💾 LOCAL STORAGE: ON</div>
+
 <!-- FAB Mobile Button -->
 <button class="fab-add" onclick="openAdd()" title="إضافة عقدة">⊕</button>
 
@@ -663,8 +725,10 @@ header {
 
   <!-- EXPORT / IMPORT / RESET -->
   <div class="sidebar-section">
-    <button class="btn" onclick="exportData()" style="color:var(--yellow);border-color:rgba(255,221,0,0.25);margin-bottom:7px;">⬇ تصدير البيانات</button>
-    <button class="btn" onclick="importData()" style="color:var(--cyan);border-color:rgba(0,238,255,0.25);margin-bottom:7px;">⬆ استيراد البيانات</button>
+    <div class="sidebar-label">// نقل البيانات</div>
+    <button class="btn" onclick="openTransfer();closeSettingsPanel();" style="color:var(--green);border-color:rgba(0,255,136,0.3);margin-bottom:7px;font-weight:700;">🔐 نقل مشفر (Transfer Code)</button>
+    <button class="btn" onclick="exportData()" style="color:var(--yellow);border-color:rgba(255,221,0,0.25);margin-bottom:7px;">⬇ تصدير JSON</button>
+    <button class="btn" onclick="importData()" style="color:var(--cyan);border-color:rgba(0,238,255,0.25);margin-bottom:7px;">⬆ استيراد JSON</button>
     <button class="btn btn-del" onclick="resetTree()" style="margin-bottom:0;">⚠ إعادة ضبط الكل</button>
   </div>
 
@@ -771,6 +835,67 @@ header {
 
 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="handleImport(event)"/>
 
+<!-- MODAL: SECURE TRANSFER -->
+<div class="overlay" id="overlayTransfer">
+  <div class="modal" style="width:520px;max-width:95vw;">
+    <div class="modal-title">// نقل البيانات المشفرة</div>
+
+    <!-- TAB SWITCHER -->
+    <div class="transfer-tabs">
+      <button class="ttab active" id="tabExport" onclick="switchTab('export')">⬇ توليد رمز النقل</button>
+      <button class="ttab" id="tabImport" onclick="switchTab('import')">⬆ استيراد عبر الرمز</button>
+    </div>
+
+    <!-- EXPORT PANEL -->
+    <div id="panelExport" class="transfer-panel">
+      <div class="transfer-info-box">
+        <span class="hl">[ AES-256-GCM ]</span> يتم تشفير بياناتك بالكامل باستخدام مفتاح فريد مشتق من كلمة المرور. لا يمكن فك التشفير بدون كلمة المرور الصحيحة.
+      </div>
+      <div class="modal-field">
+        <label>// كلمة المرور (اختياري — إذا تركتها فارغة يُستخدم مفتاح ثابت)</label>
+        <div class="pass-row">
+          <input type="password" id="exportPass" placeholder="أدخل كلمة مرور..." autocomplete="new-password"/>
+          <button class="pass-eye" onclick="togglePass('exportPass',this)">👁</button>
+        </div>
+      </div>
+      <button class="btn" id="btnGenerate" onclick="generateToken()" style="color:var(--green);border-color:rgba(0,255,136,0.3);margin-bottom:12px;width:100%;">⚡ توليد رمز النقل المشفر</button>
+      <div class="modal-field" id="exportResult" style="display:none;">
+        <label>// رمز النقل — انسخه واحفظه في مكان آمن</label>
+        <div class="token-box" id="tokenDisplay"></div>
+        <div class="token-actions">
+          <button class="btn" onclick="copyToken()" style="color:var(--cyan);border-color:rgba(0,238,255,0.25);flex:1;">⎘ نسخ الرمز</button>
+          <button class="btn" onclick="downloadToken()" style="color:var(--yellow);border-color:rgba(255,221,0,0.25);flex:1;">⬇ تنزيل كملف</button>
+        </div>
+        <div class="token-meta" id="tokenMeta"></div>
+      </div>
+    </div>
+
+    <!-- IMPORT PANEL -->
+    <div id="panelImport" class="transfer-panel" style="display:none;">
+      <div class="transfer-info-box" style="border-color:rgba(0,238,255,0.2);background:rgba(0,238,255,0.04);">
+        <span style="color:var(--cyan)">[ استيراد ]</span> الصق رمز النقل المولّد مسبقاً ثم أدخل كلمة المرور إن وجدت لفك تشفيره واستعادة البيانات.
+      </div>
+      <div class="modal-field">
+        <label>// الصق رمز النقل هنا</label>
+        <textarea id="importToken" placeholder="الصق الرمز المشفر هنا..." style="height:110px;font-family:var(--mono);font-size:0.62rem;resize:vertical;direction:ltr;"></textarea>
+      </div>
+      <div class="modal-field">
+        <label>// كلمة المرور (اتركها فارغة إن لم تكن تستخدم كلمة مرور)</label>
+        <div class="pass-row">
+          <input type="password" id="importPass" placeholder="كلمة المرور..." autocomplete="current-password"/>
+          <button class="pass-eye" onclick="togglePass('importPass',this)">👁</button>
+        </div>
+      </div>
+      <button class="btn" id="btnImportToken" onclick="importToken()" style="color:var(--cyan);border-color:rgba(0,238,255,0.3);width:100%;margin-bottom:8px;">🔓 فك التشفير واستيراد البيانات</button>
+      <div class="import-status" id="importStatus"></div>
+    </div>
+
+    <div class="modal-btns" style="margin-top:12px;">
+      <button class="mbtn mbtn-cancel" onclick="closeTransfer()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════════════
 // BACKGROUND (Matrix Rain)
@@ -842,6 +967,41 @@ let currentType='هدف';
 let panX=0, panY=0, zoom=1;
 let isPanning=false, panStart={x:0,y:0};
 let modalLinks=[];
+
+// ══════════════════════════════════════════════════
+// LOCAL STORAGE — AUTO SAVE / LOAD
+// ══════════════════════════════════════════════════
+const LS_KEY = 'cyberTree_v4_data';
+let lsSaveTimer = null;
+
+function lsSave(){
+  const badge = document.getElementById('lsBadge');
+  if(badge){ badge.textContent='💾 SAVING...'; badge.className='ls-badge saving'; }
+  clearTimeout(lsSaveTimer);
+  lsSaveTimer = setTimeout(()=>{
+    try {
+      const payload = JSON.stringify({ root, uid, panX, panY, zoom, currentType, ts: Date.now() });
+      localStorage.setItem(LS_KEY, payload);
+      if(badge){ badge.textContent='💾 LOCAL STORAGE: SAVED'; badge.className='ls-badge saved'; }
+    } catch(e){
+      if(badge){ badge.textContent='⚠ STORAGE FULL'; badge.className='ls-badge saving'; }
+    }
+  }, 600);
+}
+
+function lsLoad(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(d.root){ root=d.root; uid=d.uid||uid; }
+    if(d.panX!==undefined){ panX=d.panX; panY=d.panY; zoom=d.zoom||1; }
+    if(d.currentType) currentType=d.currentType;
+  } catch(e){ console.warn('LS load error',e); }
+}
+
+// Load on startup
+lsLoad();
 
 function getAllLinks(){
   const all=[];
@@ -1502,7 +1662,7 @@ function confirmModal(){
     node.links=[...modalLinks];
     currentType=type;
   }
-  closeModal(); render();
+  closeModal(); render(); lsSave();
   if(selectedId) updateInfo(find(root,selectedId));
   updateTypeGrid();
 }
@@ -1555,7 +1715,7 @@ function deleteLmLink(i){
   if(!node) return;
   node.links.splice(i,1);
   renderLmLinks();
-  updateStats();
+  updateStats(); lsSave();
 }
 
 function addLinkFromManager(){
@@ -1571,7 +1731,7 @@ function addLinkFromManager(){
   document.getElementById('lmAlias').value='';
   document.getElementById('lmUrl').value='';
   renderLmLinks();
-  updateStats();
+  updateStats(); lsSave();
   showNotif('تمت إضافة: '+alias);
 }
 
@@ -1618,19 +1778,19 @@ function centerView(){ panX=0; panY=0; zoom=1; document.getElementById('zoomPct'
 
 function deleteSelected(){
   if(!selectedId) { showNotif('اختر عقدة أولاً'); return; }
-  if(root&&selectedId===root.id){ root=null; selectedId=null; updateInfo(); render(); return; }
+  if(root&&selectedId===root.id){ root=null; selectedId=null; updateInfo(); render(); lsSave(); return; }
   const par=findParent(root,selectedId);
   if(!par) return;
   par.children=par.children.filter(c=>c.id!==selectedId);
   selectedId=par.id;
-  updateInfo(par); render();
+  updateInfo(par); render(); lsSave();
 }
 
 function resetTree(){
   if(!confirm('إعادة ضبط الشجرة كاملاً؟ سيتم حذف جميع البيانات.')) return;
   root=null; selectedId=null; uid=1;
   panX=0; panY=0; zoom=1;
-  updateInfo(); render();
+  updateInfo(); render(); lsSave();
   showNotif('تم إعادة ضبط الشجرة');
 }
 
@@ -1666,7 +1826,7 @@ function handleImport(e){
   reader.onload=ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      if(data.root){ root=data.root; uid=data.uid||uid; selectedId=null; render(); showNotif('تم استيراد البيانات'); }
+      if(data.root){ root=data.root; uid=data.uid||uid; selectedId=null; render(); lsSave(); showNotif('تم استيراد البيانات'); }
     } catch(err){ showNotif('خطأ في قراءة الملف'); }
   };
   reader.readAsText(file);
@@ -1764,6 +1924,176 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('resize',()=>{ render(); });
 
 // ══════════════════════════════════════════════════
+// AES-256-GCM CRYPTO ENGINE
+// ══════════════════════════════════════════════════
+const CRYPTO_SALT = 'CyberTreeV4_SALT_2025';
+const FALLBACK_PASS = 'CyberTree_DefaultKey_v4!';
+
+async function deriveKey(password) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password || FALLBACK_PASS),
+    { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode(CRYPTO_SALT), iterations: 200000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false, ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptData(plaintext, password) {
+  const key = await deriveKey(password);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    enc.encode(plaintext)
+  );
+  // Pack: 12-byte IV + ciphertext → Base64
+  const combined = new Uint8Array(iv.byteLength + ciphertext.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(ciphertext), iv.byteLength);
+  return btoa(String.fromCharCode(...combined));
+}
+
+async function decryptData(b64Token, password) {
+  const combined = Uint8Array.from(atob(b64Token), c => c.charCodeAt(0));
+  const iv = combined.slice(0, 12);
+  const ciphertext = combined.slice(12);
+  const key = await deriveKey(password);
+  const dec = new TextDecoder();
+  const plain = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    ciphertext
+  );
+  return dec.decode(plain);
+}
+
+function countNodes(node) {
+  if (!node) return 0;
+  return 1 + node.children.reduce((a, c) => a + countNodes(c), 0);
+}
+
+// ══════════════════════════════════════════════════
+// TRANSFER UI
+// ══════════════════════════════════════════════════
+let currentToken = '';
+
+function openTransfer() {
+  document.getElementById('overlayTransfer').classList.add('active');
+  switchTab('export');
+  document.getElementById('exportResult').style.display = 'none';
+  document.getElementById('exportPass').value = '';
+  document.getElementById('importPass').value = '';
+  document.getElementById('importToken').value = '';
+  const st = document.getElementById('importStatus');
+  st.style.display = 'none';
+}
+
+function closeTransfer() {
+  document.getElementById('overlayTransfer').classList.remove('active');
+}
+
+function switchTab(tab) {
+  document.getElementById('tabExport').classList.toggle('active', tab === 'export');
+  document.getElementById('tabImport').classList.toggle('active', tab === 'import');
+  document.getElementById('panelExport').style.display = tab === 'export' ? '' : 'none';
+  document.getElementById('panelImport').style.display = tab === 'import' ? '' : 'none';
+}
+
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+async function generateToken() {
+  if (!root) { showNotif('لا توجد بيانات للتصدير'); return; }
+  const btn = document.getElementById('btnGenerate');
+  btn.textContent = '⏳ جاري التشفير...'; btn.disabled = true;
+  try {
+    const password = document.getElementById('exportPass').value;
+    const payload = JSON.stringify({ root, uid, currentType, ts: Date.now(), app: 'CyberTree_v4' });
+    const token = await encryptData(payload, password);
+    currentToken = token;
+    document.getElementById('tokenDisplay').textContent = token;
+    const nodeCnt = countNodes(root);
+    const bytes = new TextEncoder().encode(payload).byteLength;
+    document.getElementById('tokenMeta').innerHTML =
+      `✦ عقد: <span style="color:var(--cyan)">${nodeCnt}</span> &nbsp;|&nbsp; ` +
+      `حجم البيانات: <span style="color:var(--cyan)">${bytes} byte</span> &nbsp;|&nbsp; ` +
+      `رمز مشفر: <span style="color:var(--green)">${token.length} char</span><br>` +
+      `✦ خوارزمية: <span style="color:var(--yellow)">AES-256-GCM</span> &nbsp;|&nbsp; ` +
+      `اشتقاق المفتاح: <span style="color:var(--yellow)">PBKDF2-SHA256 × 200,000</span><br>` +
+      `✦ ${password ? '🔐 محمي بكلمة مرور مخصصة' : '🔑 مشفر بمفتاح افتراضي (بدون كلمة مرور)'}`;
+    document.getElementById('exportResult').style.display = '';
+  } catch(e) {
+    showNotif('خطأ في التشفير: ' + e.message);
+  }
+  btn.textContent = '⚡ توليد رمز النقل المشفر'; btn.disabled = false;
+}
+
+function copyToken() {
+  if (!currentToken) return;
+  navigator.clipboard.writeText(currentToken).then(() => {
+    showNotif('✓ تم نسخ الرمز إلى الحافظة');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = currentToken; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+    showNotif('✓ تم نسخ الرمز');
+  });
+}
+
+function downloadToken() {
+  if (!currentToken) return;
+  const blob = new Blob([currentToken], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cyber-tree-token-' + Date.now() + '.ctk';
+  a.click();
+  showNotif('⬇ تم تنزيل ملف الرمز (.ctk)');
+}
+
+async function importToken() {
+  const token = document.getElementById('importToken').value.trim();
+  const password = document.getElementById('importPass').value;
+  const st = document.getElementById('importStatus');
+  const btn = document.getElementById('btnImportToken');
+
+  if (!token) { showNotif('الصق رمز النقل أولاً'); return; }
+
+  st.style.display = '';
+  st.className = 'import-status';
+  st.textContent = '⏳ جاري فك التشفير...';
+  btn.disabled = true;
+
+  try {
+    const plain = await decryptData(token, password);
+    const data = JSON.parse(plain);
+    if (!data.root || data.app !== 'CyberTree_v4') throw new Error('بيانات غير صالحة أو رمز تالف');
+    root = data.root;
+    uid = data.uid || uid;
+    if (data.currentType) currentType = data.currentType;
+    selectedId = null;
+    render(); updateInfo(); updateTypeGrid(); lsSave();
+    st.className = 'import-status ok';
+    st.textContent = `✓ تم الاستيراد بنجاح — ${countNodes(root)} عقدة محملة • تم حفظها في التخزين المحلي`;
+    showNotif('✓ تم استيراد البيانات المشفرة');
+  } catch(e) {
+    st.className = 'import-status err';
+    st.textContent = '✕ فشل فك التشفير — تحقق من صحة الرمز وكلمة المرور';
+  }
+  btn.disabled = false;
+}
+
+// ══════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════
 // Collapse drag hint after a moment on mobile
@@ -1772,7 +2102,24 @@ setTimeout(()=>{
   if(hint) hint.style.opacity='0';
 },6000);
 
+// Update LS badge with last saved time
+(function(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){
+      const d=JSON.parse(raw);
+      const badge=document.getElementById('lsBadge');
+      if(badge&&d.ts){
+        const ago=new Date(d.ts).toLocaleTimeString('ar-SA');
+        badge.textContent=`💾 LOCAL • آخر حفظ: ${ago}`;
+        badge.className='ls-badge saved';
+      }
+    }
+  }catch(e){}
+})();
+
 render();
+updateTypeGrid();
 </script>
 </body>
 </html>
