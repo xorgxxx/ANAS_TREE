@@ -233,8 +233,8 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
           <feGaussianBlur stdDeviation="2" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <marker id="arrowCross" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,221,0,0.6)"/>
+        <marker id="arrowCross" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="rgba(255,221,0,0.8)"/>
         </marker>
       </defs>
       <!-- Cross-links layer (below tree) -->
@@ -346,6 +346,9 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
   <div class="ctx-item c-green" onclick="ctxCollapse()">▶ طي / توسيع</div>
   <div class="ctx-divider"></div>
   <div class="ctx-item c-yellow" onclick="ctxCrossLink()">⟷ ربط بعقدة أخرى</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="ctxScaleUp()" style="color:#00eeff">⊕ تكبير العقدة</div>
+  <div class="ctx-item" onclick="ctxScaleDown()" style="color:#cc44ff">⊖ تصغير العقدة</div>
   <div class="ctx-item c-green" onclick="ctxOpenLinks()">⊞ الروابط</div>
   <div class="ctx-divider"></div>
   <div class="ctx-item danger" onclick="ctxDelete()">⊗ حذف العقدة</div>
@@ -460,8 +463,10 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
   <div class="modal" style="width:480px;max-width:95vw;">
     <div class="modal-title">// نقل البيانات المشفرة</div>
     <div class="transfer-tabs">
-      <button class="ttab active" id="tabExport" onclick="switchTab('export')">⬇ توليد رمز</button>
-      <button class="ttab" id="tabImport" onclick="switchTab('import')">⬆ استيراد رمز</button>
+      <button class="ttab active" id="tabExport" onclick="switchTab('export')">🔐 رمز آمن</button>
+      <button class="ttab" id="tabImport" onclick="switchTab('import')">⬆ استيراد آمن</button>
+      <button class="ttab" id="tabShort" onclick="switchTab('short')">🔑 رمز قصير</button>
+      <button class="ttab" id="tabShortImport" onclick="switchTab('shortImport')">📥 استيراد قصير</button>
     </div>
     <div id="panelExport">
       <div class="transfer-info-box"><span style="color:var(--red)">[ AES-256-GCM ]</span> بياناتك مشفرة. بدون كلمة المرور لا يمكن فك التشفير.</div>
@@ -498,6 +503,33 @@ header{position:relative;z-index:20;display:flex;align-items:center;justify-cont
       <button class="btn" id="btnImportToken" onclick="importToken()" style="color:var(--cyan);border-color:rgba(0,238,255,0.3);width:100%;margin-bottom:6px;">🔓 فك التشفير واستيراد</button>
       <div class="import-status" id="importStatus"></div>
     </div>
+    <div id="panelShort" style="display:none;">
+      <div class="transfer-info-box" style="border-color:rgba(255,221,0,0.2);background:rgba(255,221,0,0.04);">
+        <span style="color:var(--yellow)">[ رمز قصير ]</span> رمز قصير سهل الكتابة يدوياً. لا يحتاج كلمة مرور لكنه أقل أماناً من الرمز المشفر. مناسب للنقل السريع.
+      </div>
+      <button class="btn" id="btnGenShort" onclick="generateShortCode()" style="color:var(--yellow);border-color:rgba(255,221,0,0.3);width:100%;margin-bottom:9px;">⚡ توليد رمز قصير</button>
+      <div id="shortCodeResult" style="display:none;">
+        <div class="modal-field">
+          <label>// الرمز القصير (8 أحرف)</label>
+          <div id="shortCodeDisplay" style="font-family:var(--mono);font-size:2rem;color:var(--yellow);background:rgba(0,0,0,0.5);border:1px solid rgba(255,221,0,0.4);border-radius:6px;padding:14px;text-align:center;letter-spacing:8px;word-break:break-all;"></div>
+        </div>
+        <div class="token-actions">
+          <button class="btn" onclick="copyShortCode()" style="color:var(--cyan);border-color:rgba(0,238,255,0.25);flex:1;">⎘ نسخ</button>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.55rem;color:rgba(255,221,0,0.4);margin-top:6px;text-align:center;">⚠ الرمز القصير لا يشفر البيانات. استخدمه فقط في بيئة آمنة.</div>
+      </div>
+    </div>
+    <div id="panelShortImport" style="display:none;">
+      <div class="transfer-info-box" style="border-color:rgba(255,221,0,0.2);background:rgba(255,221,0,0.04);">
+        <span style="color:var(--yellow)">[ استيراد قصير ]</span> أدخل الرمز القصير المكوّن من 8 أحرف.
+      </div>
+      <div class="modal-field">
+        <label>// أدخل الرمز القصير</label>
+        <input type="text" id="shortCodeInput" placeholder="مثال: A3B7X2KQ" maxlength="8" autocomplete="off" style="font-family:var(--mono);font-size:1.5rem;text-align:center;letter-spacing:6px;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <button class="btn" id="btnImportShort" onclick="importShortCode()" style="color:var(--yellow);border-color:rgba(255,221,0,0.3);width:100%;margin-bottom:6px;">🔓 استيراد الرمز</button>
+      <div class="import-status" id="shortImportStatus"></div>
+    </div>
     <div class="modal-btns" style="margin-top:9px;">
       <button class="mbtn mbtn-cancel" onclick="closeTransfer()">إغلاق</button>
     </div>
@@ -525,7 +557,7 @@ const TYPE_COLOR_NAME={
 let uid=1;
 function mkId(){ return uid++; }
 function mkNode(name,type='هدف',note='',parentId=null){
-  return {id:mkId(),name,type,note,parentId,children:[],collapsed:false,links:[],crossLinks:[]};
+  return {id:mkId(),name,type,note,parentId,children:[],collapsed:false,links:[],crossLinks:[],scale:1};
 }
 
 let root=null;
@@ -724,26 +756,33 @@ function renderLinks(node){
 // ══════════════════════════════════════════════════
 function renderCrossLinks(){
   if(!crossLinks.length||!root) return;
+  // Clean up any stale cross-links where nodes no longer exist
+  crossLinks=crossLinks.filter(cl=>find(root,cl.fromId)&&find(root,cl.toId));
   crossLinks.forEach(cl=>{
     const from=find(root,cl.fromId);
     const to=find(root,cl.toId);
     if(!from||!to||from._x===undefined||to._x===undefined) return;
 
+    // Calculate edge points (start/end at node radius, not center)
     const x1=from._x,y1=from._y;
     const x2=to._x,y2=to._y;
-    const mx=(x1+x2)/2;
-    const my=(y1+y2)/2;
-    // arc that bends outward
     const dx=x2-x1,dy=y2-y1;
     const len=Math.sqrt(dx*dx+dy*dy)||1;
-    const perpX=-dy/len*40,perpY=dx/len*40;
-    const d=`M${x1},${y1} Q${mx+perpX},${my+perpY} ${x2},${y2}`;
+    const r1=getNodeR(from)+3;
+    const r2=getNodeR(to)+8; // extra offset for arrowhead
+    const sx=x1+dx/len*r1,sy=y1+dy/len*r1;
+    const ex=x2-dx/len*r2,ey=y2-dy/len*r2;
+
+    const mx=(sx+ex)/2;
+    const my=(sy+ey)/2;
+    const perpX=-dy/len*50,perpY=dx/len*50;
+    const d=`M${sx},${sy} Q${mx+perpX},${my+perpY} ${ex},${ey}`;
 
     const path=document.createElementNS(NS,'path');
     path.setAttribute('d',d);
     path.setAttribute('fill','none');
-    path.setAttribute('stroke','rgba(255,221,0,0.45)');
-    path.setAttribute('stroke-width','1.2');
+    path.setAttribute('stroke','rgba(255,221,0,0.55)');
+    path.setAttribute('stroke-width','1.4');
     path.setAttribute('stroke-dasharray','6 3');
     path.setAttribute('marker-end','url(#arrowCross)');
     crossLinksG.appendChild(path);
@@ -791,7 +830,8 @@ function renderCrossLinkLabel(node,linked){
 }
 
 function getNodeR(node){
-  return node._depth===0?20:Math.max(9,16-node._depth*1.5);
+  const base=node._depth===0?20:Math.max(9,16-node._depth*1.5);
+  return base*(node.scale||1);
 }
 
 function renderNodes(node){
@@ -1048,12 +1088,13 @@ const canvasWrap=document.getElementById('canvasWrap');
 let panActive=false;
 
 canvasWrap.addEventListener('mousedown',e=>{
-  if(e.button===0&&(e.target===svgEl||e.target.tagName==='svg'||e.target.closest('g')===nodesG.parentElement)){
+  // Only pan when clicking on background (not on nodes)
+  if(e.button===0&&(e.target===svgEl||e.target.tagName==='svg'||e.target.id==='treeCanvas'||
+    (e.target.tagName!=='circle'&&e.target.tagName!=='text'&&e.target.tagName!=='rect'&&!e.target.closest('[data-nodeid]')))){
     panActive=true;panStart={x:e.clientX-panX,y:e.clientY-panY};canvasWrap.style.cursor='grabbing';
+    hideCtxMenu();
+    hideLinkPopup();
   }
-});
-canvasWrap.addEventListener('mousedown',e=>{
-  if(e.target===svgEl){panActive=true;panStart={x:e.clientX-panX,y:e.clientY-panY};canvasWrap.style.cursor='grabbing';}
 });
 window.addEventListener('mousemove',e=>{
   if(!panActive) return;
@@ -1097,8 +1138,14 @@ canvasWrap.addEventListener('touchmove',e=>{
 canvasWrap.addEventListener('touchend',e=>{lastTouches=e.touches.length>0?[...e.touches]:null;lastDist=null;},{passive:true});
 
 svgEl.addEventListener('click',e=>{
-  if(e.target===svgEl){selectedId=null;updateInfo();scheduleRender();}
-  hideCtxMenu();
+  if(e.target===svgEl||e.target.closest('g')===null){
+    selectedId=null;updateInfo();scheduleRender();
+    hideCtxMenu();
+    hideLinkPopup();
+    hideTooltip();
+  } else {
+    hideCtxMenu();
+  }
 });
 
 function zoomIn(){zoom=Math.min(5,zoom*1.15);document.getElementById('zoomPct').textContent=Math.round(zoom*100)+'%';scheduleRender();}
@@ -1379,6 +1426,8 @@ function ctxCollapse(){hideCtxMenu();const n=find(root,selectedId);if(n) toggleC
 function ctxDelete(){hideCtxMenu();deleteSelected();}
 function ctxOpenLinks(){hideCtxMenu();openLinkManager();}
 function ctxCrossLink(){hideCtxMenu();openCrossLinkModal();}
+function ctxScaleUp(){hideCtxMenu();const n=find(root,selectedId);if(n){n.scale=Math.min(3,(n.scale||1)+0.25);scheduleRender();lsSave();}}
+function ctxScaleDown(){hideCtxMenu();const n=find(root,selectedId);if(n){n.scale=Math.max(0.3,(n.scale||1)-0.25);scheduleRender();lsSave();}}
 document.addEventListener('click',hideCtxMenu);
 
 // ══════════════════════════════════════════════════
@@ -1453,6 +1502,67 @@ function toggleFullscreen(){
 }
 
 // ══════════════════════════════════════════════════
+// SHORT CODE (8-char, easy to type manually)
+// Strategy: JSON → compress → base62 → take first 8 chars as "seed"
+// For recovery: we store in localStorage under the code as key
+// This is NOT encrypted but enables quick manual transfer via short ID
+// ══════════════════════════════════════════════════
+const SHORT_LS_PREFIX='cyberTree_short_';
+const SHORT_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars, no confusable
+
+function genShortId(){
+  let id='';
+  const arr=new Uint8Array(8);
+  crypto.getRandomValues(arr);
+  for(let i=0;i<8;i++) id+=SHORT_CHARS[arr[i]%SHORT_CHARS.length];
+  return id;
+}
+
+function generateShortCode(){
+  if(!root){showNotif('لا توجد بيانات');return;}
+  const code=genShortId();
+  const data=JSON.stringify({root,uid,crossLinks,ts:Date.now(),app:'CyberTree_v1'});
+  // Store in localStorage under the short code
+  try{
+    localStorage.setItem(SHORT_LS_PREFIX+code, data);
+    // Also keep a list of generated codes
+    let codes=[];
+    try{codes=JSON.parse(localStorage.getItem('cyberTree_short_codes')||'[]');}catch{}
+    codes.unshift({code,ts:Date.now()});
+    if(codes.length>20) codes=codes.slice(0,20);
+    localStorage.setItem('cyberTree_short_codes',JSON.stringify(codes));
+  }catch(e){showNotif('خطأ في الحفظ المحلي');return;}
+  document.getElementById('shortCodeDisplay').textContent=code;
+  document.getElementById('shortCodeResult').style.display='';
+  showNotif('✓ تم توليد الرمز القصير');
+}
+
+let _lastShortCode='';
+function copyShortCode(){
+  const code=document.getElementById('shortCodeDisplay').textContent;
+  if(!code) return;
+  _lastShortCode=code;
+  navigator.clipboard.writeText(code).then(()=>showNotif('✓ تم نسخ الرمز')).catch(()=>showNotif('فشل النسخ'));
+}
+
+function importShortCode(){
+  const code=(document.getElementById('shortCodeInput').value||'').trim().toUpperCase();
+  const st=document.getElementById('shortImportStatus');
+  st.style.display='';
+  if(code.length!==8){st.className='import-status err';st.textContent='✕ الرمز يجب أن يكون 8 أحرف';return;}
+  const raw=localStorage.getItem(SHORT_LS_PREFIX+code);
+  if(!raw){st.className='import-status err';st.textContent='✕ الرمز غير موجود في هذا المتصفح';return;}
+  try{
+    const data=JSON.parse(raw);
+    if(!data.root||data.app!=='CyberTree_v1') throw new Error('بيانات غير صالحة');
+    root=data.root;uid=data.uid||uid;if(data.crossLinks) crossLinks=data.crossLinks;
+    selectedId=null;scheduleRender();updateInfo();updateTypeGrid();lsSave();
+    st.className='import-status ok';st.textContent='✓ تم الاستيراد — '+countNodes(root)+' عقدة';
+    showNotif('✓ تم الاستيراد');
+  }catch(e){st.className='import-status err';st.textContent='✕ بيانات تالفة';}
+}
+
+// ══════════════════════════════════════════════════
 // AES-256-GCM CRYPTO
 // ══════════════════════════════════════════════════
 const CRYPTO_SALT='CyberTreeV1_SALT_2025';
@@ -1484,13 +1594,18 @@ function openTransfer(){
   document.getElementById('importPass').value='';
   document.getElementById('importToken').value='';
   document.getElementById('importStatus').style.display='none';
+  document.getElementById('shortCodeResult').style.display='none';
+  document.getElementById('shortImportStatus').style.display='none';
+  const si=document.getElementById('shortCodeInput');if(si) si.value='';
 }
 function closeTransfer(){document.getElementById('overlayTransfer').classList.remove('active');}
 function switchTab(tab){
-  document.getElementById('tabExport').classList.toggle('active',tab==='export');
-  document.getElementById('tabImport').classList.toggle('active',tab==='import');
-  document.getElementById('panelExport').style.display=tab==='export'?'':'none';
-  document.getElementById('panelImport').style.display=tab==='import'?'':'none';
+  ['export','import','short','shortImport'].forEach(t=>{
+    const btn=document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    const panel=document.getElementById('panel'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(btn) btn.classList.toggle('active',t===tab);
+    if(panel) panel.style.display=(t===tab?'':'none');
+  });
 }
 function togglePass(id,btn){const inp=document.getElementById(id);if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}else{inp.type='password';btn.textContent='👁';}}
 async function generateToken(){
@@ -1557,7 +1672,7 @@ document.addEventListener('keydown',e=>{
     case 'f':case 'F': toggleFullscreen(); break;
     case '+':case '=': zoomIn(); break;
     case '-': zoomOut(); break;
-    case 'Escape': closeSettingsPanel();hideLinkPopup();selectedId=null;updateInfo();scheduleRender(); break;
+    case 'Escape': closeSettingsPanel();hideLinkPopup();hideTooltip();hideCtxMenu();selectedId=null;updateInfo();scheduleRender(); break;
   }
 });
 
